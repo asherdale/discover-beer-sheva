@@ -44,17 +44,17 @@ export class HomePage {
   ) {
     this.platform.ready().then(() => this.loadMaps());
     this.regionals = [{
-      "title": "Marker 1",
-      "latitude": 52.50094,
-      "longitude": 13.29922,
+      "title": "Performance Rock Beersheba",
+      "latitude": 31.238039,
+      "longitude": 34.793046,
     }, {
-      "title": "Marker 3",
-      "latitude": 52.50010,
-      "longitude": 13.29922,
+      "title": "Beit HaBaguette",
+      "latitude": 31.238168,
+      "longitude": 34.792666,
     }, {
-      "title": "Marker 2",
-      "latitude": 49.1028606,
-      "longitude": 9.8426116
+      "title": "Carraso Science Park",
+      "latitude": 31.241974,
+      "longitude": 34.785521,
     }];
   }
 
@@ -149,10 +149,59 @@ export class HomePage {
     this.zone.run(() => {
       var mapEle = this.mapElement.nativeElement;
       this.map = new google.maps.Map(mapEle, {
-        zoom: 10,
-        center: { lat: 51.165691, lng: 10.451526 },
+        // zoom: 10,
+        // center: { lat: 34.793139, lng: 31.251530 },
         mapTypeId: google.maps.MapTypeId.ROADMAP,
-        styles: [{ "featureType": "water", "elementType": "geometry", "stylers": [{ "color": "#e9e9e9" }, { "lightness": 17 }] }, { "featureType": "landscape", "elementType": "geometry", "stylers": [{ "color": "#f5f5f5" }, { "lightness": 20 }] }, { "featureType": "road.highway", "elementType": "geometry.fill", "stylers": [{ "color": "#ffffff" }, { "lightness": 17 }] }, { "featureType": "road.highway", "elementType": "geometry.stroke", "stylers": [{ "color": "#ffffff" }, { "lightness": 29 }, { "weight": 0.2 }] }, { "featureType": "road.arterial", "elementType": "geometry", "stylers": [{ "color": "#ffffff" }, { "lightness": 18 }] }, { "featureType": "road.local", "elementType": "geometry", "stylers": [{ "color": "#ffffff" }, { "lightness": 16 }] }, { "featureType": "poi", "elementType": "geometry", "stylers": [{ "color": "#f5f5f5" }, { "lightness": 21 }] }, { "featureType": "poi.park", "elementType": "geometry", "stylers": [{ "color": "#dedede" }, { "lightness": 21 }] }, { "elementType": "labels.text.stroke", "stylers": [{ "visibility": "on" }, { "color": "#ffffff" }, { "lightness": 16 }] }, { "elementType": "labels.text.fill", "stylers": [{ "saturation": 36 }, { "color": "#333333" }, { "lightness": 40 }] }, { "elementType": "labels.icon", "stylers": [{ "visibility": "off" }] }, { "featureType": "transit", "elementType": "geometry", "stylers": [{ "color": "#f2f2f2" }, { "lightness": 19 }] }, { "featureType": "administrative", "elementType": "geometry.fill", "stylers": [{ "color": "#fefefe" }, { "lightness": 20 }] }, { "featureType": "administrative", "elementType": "geometry.stroke", "stylers": [{ "color": "#fefefe" }, { "lightness": 17 }, { "weight": 1.2 }] }],
+        styles: [
+          // { "featureType": "water", "elementType": "geometry", "stylers": [{ "color": "#e9e9e9" }, { "lightness": 17 }] },
+          // { "featureType": "landscape", "elementType": "geometry", "stylers": [{ "color": "#f5f5f5" }, { "lightness": 20 }] },
+          // { "featureType": "road.highway", "elementType": "geometry.fill", "stylers": [{ "color": "#ffffff" }, { "lightness": 17 }] },
+          // { "featureType": "road.highway", "elementType": "geometry.stroke", "stylers": [{ "color": "#ffffff" }, { "lightness": 29 }, { "weight": 0.2 }] },
+          // { "featureType": "road.arterial", "elementType": "geometry", "stylers": [{ "color": "#ffffff" }, { "lightness": 18 }] },
+          // { "featureType": "road.local", "elementType": "geometry", "stylers": [{ "color": "#ffffff" }, { "lightness": 16 }] },
+          // { "featureType": "poi", "elementType": "geometry", "stylers": [{ "color": "#f5f5f5" }, { "lightness": 21 }] },
+          // { "featureType": "poi.park", "elementType": "geometry", "stylers": [{ "color": "#dedede" }, { "lightness": 21 }] },
+          // { "elementType": "labels.text.stroke", "stylers": [{ "visibility": "on" }, { "color": "#ffffff" }, { "lightness": 16 }] },
+          // { "elementType": "labels.text.fill", "stylers": [{ "saturation": 36 }, { "color": "#333333" }, { "lightness": 40 }] }, { "elementType": "labels.icon", "stylers": [{ "visibility": "off" }] },
+          // { "featureType": "transit", "elementType": "geometry", "stylers": [{ "color": "#f2f2f2" }, { "lightness": 19 }] },
+          // { "featureType": "administrative", "elementType": "geometry.fill", "stylers": [{ "color": "#fefefe" }, { "lightness": 20 }] },
+          // { "featureType": "administrative", "elementType": "geometry.stroke", "stylers": [{ "color": "#fefefe" }, { "lightness": 17 }, { "weight": 1.2 }] }
+          // { "featureType": "poi", stylers: [{ visibility: "off" }] }
+          {
+            "featureType": "administrative",
+            "elementType": "geometry",
+            "stylers": [
+              {
+                "visibility": "off"
+              }
+            ]
+          },
+          {
+            "featureType": "poi",
+            "stylers": [
+              {
+                "visibility": "off"
+              }
+            ]
+          },
+          {
+            "featureType": "road",
+            "elementType": "labels.icon",
+            "stylers": [
+              {
+                "visibility": "off"
+              }
+            ]
+          },
+          {
+            "featureType": "transit",
+            "stylers": [
+              {
+                "visibility": "off"
+              }
+            ]
+          }
+        ],
         disableDoubleClickZoom: false,
         disableDefaultUI: true,
         zoomControl: true,
@@ -190,40 +239,40 @@ export class HomePage {
         });
       }
 
-      new MarkerClusterer(this.map, markers, {
-        styles: [
-          {
-            height: 53,
-            url: "assets/img/cluster/MapMarkerJS.png",
-            width: 53,
-            textColor: '#fff'
-          },
-          {
-            height: 56,
-            url: "assets/img/cluster/MapMarkerJS.png",
-            width: 56,
-            textColor: '#fff'
-          },
-          {
-            height: 66,
-            url: "assets/img/cluster/MapMarkerJS.png",
-            width: 66,
-            textColor: '#fff'
-          },
-          {
-            height: 78,
-            url: "assets/img/cluster/MapMarkerJS.png",
-            width: 78,
-            textColor: '#fff'
-          },
-          {
-            height: 90,
-            url: "assets/img/cluster/MapMarkerJS.png",
-            width: 90,
-            textColor: '#fff'
-          }
-        ]
-      });
+      // new MarkerClusterer(this.map, markers, {
+      //   styles: [
+      //     {
+      //       height: 53,
+      //       url: "assets/img/cluster/MapMarkerJS.png",
+      //       width: 53,
+      //       textColor: '#000'
+      //     },
+      //     {
+      //       height: 56,
+      //       url: "assets/img/cluster/MapMarkerJS.png",
+      //       width: 56,
+      //       textColor: '#000'
+      //     },
+      //     {
+      //       height: 66,
+      //       url: "assets/img/cluster/MapMarkerJS.png",
+      //       width: 66,
+      //       textColor: '#000'
+      //     },
+      //     {
+      //       height: 78,
+      //       url: "assets/img/cluster/MapMarkerJS.png",
+      //       width: 78,
+      //       textColor: '#000'
+      //     },
+      //     {
+      //       height: 90,
+      //       url: "assets/img/cluster/MapMarkerJS.png",
+      //       width: 90,
+      //       textColor: '#000'
+      //     }
+      //   ]
+      // });
 
 
 
