@@ -6,8 +6,12 @@ import { Geolocation } from '@ionic-native/geolocation';
 import { Observable } from 'rxjs/Observable';
 import { Storage } from '@ionic/storage';
 
+import { PlacePage } from '../place/place';
+
 declare var google: any;
-declare var MarkerClusterer: any;
+declare const jQuery: any;
+let infoWindow = null;
+let selectedPlace = null;
 
 @Component({
   selector: 'page-home',
@@ -15,7 +19,7 @@ declare var MarkerClusterer: any;
 })
 export class HomePage {
   @ViewChild('map') mapElement: ElementRef;
-  @ViewChild('searchbar', { read: ElementRef }) searchbar: ElementRef;
+  // @ViewChild('searchbar', { read: ElementRef }) searchbar: ElementRef;
   addressElement: HTMLInputElement = null;
 
   listSearch: string = '';
@@ -27,7 +31,8 @@ export class HomePage {
   error: any;
   switch: string = "map";
 
-  regionals: any = [];
+  places: any = [];
+  markers: any = [];
   currentregional: any;
 
   constructor(
@@ -43,7 +48,7 @@ export class HomePage {
     public geolocation: Geolocation
   ) {
     this.platform.ready().then(() => this.loadMaps());
-    this.regionals = [{
+    this.places = [{
       "title": "Performance Rock Beersheba",
       "latitude": 31.238039,
       "longitude": 34.793046,
@@ -58,15 +63,10 @@ export class HomePage {
     }];
   }
 
-  viewPlace(id) {
-    console.log('Clicked Marker', id);
-  }
-
-
   loadMaps() {
     if (!!google) {
       this.initializeMap();
-      this.initAutocomplete();
+      // this.initAutocomplete();
     } else {
       this.errorAlert('Error', 'Something went wrong with the Internet Connection. Please check your Internet.')
     }
@@ -88,63 +88,6 @@ export class HomePage {
     alert.present();
   }
 
-  mapsSearchBar(ev: any) {
-    // set input to the value of the searchbar
-    //this.search = ev.target.value;
-    console.log(ev);
-    const autocomplete = new google.maps.places.Autocomplete(ev);
-    autocomplete.bindTo('bounds', this.map);
-    return new Observable((sub: any) => {
-      google.maps.event.addListener(autocomplete, 'place_changed', () => {
-        const place = autocomplete.getPlace();
-        if (!place.geometry) {
-          sub.error({
-            message: 'Autocomplete returned place with no geometry'
-          });
-        } else {
-          sub.next(place.geometry.location);
-          sub.complete();
-        }
-      });
-    });
-  }
-
-  initAutocomplete(): void {
-    // reference : https://github.com/driftyco/ionic/issues/7223
-    this.addressElement = this.searchbar.nativeElement.querySelector('.searchbar-input');
-    this.createAutocomplete(this.addressElement).subscribe((location) => {
-      console.log('Searchdata', location);
-
-      let options = {
-        center: location,
-        zoom: 10
-      };
-      this.map.setOptions(options);
-      this.addMarker(location, "Mein gesuchter Standort");
-
-    });
-  }
-
-  createAutocomplete(addressEl: HTMLInputElement): Observable<any> {
-    const autocomplete = new google.maps.places.Autocomplete(addressEl);
-    autocomplete.bindTo('bounds', this.map);
-    return new Observable((sub: any) => {
-      google.maps.event.addListener(autocomplete, 'place_changed', () => {
-        const place = autocomplete.getPlace();
-        if (!place.geometry) {
-          sub.error({
-            message: 'Autocomplete returned place with no geometry'
-          });
-        } else {
-          console.log('Search Lat', place.geometry.location.lat());
-          console.log('Search Lng', place.geometry.location.lng());
-          sub.next(place.geometry.location);
-          //sub.complete();
-        }
-      });
-    });
-  }
-
   initializeMap() {
     this.zone.run(() => {
       var mapEle = this.mapElement.nativeElement;
@@ -153,20 +96,6 @@ export class HomePage {
         // center: { lat: 34.793139, lng: 31.251530 },
         mapTypeId: google.maps.MapTypeId.ROADMAP,
         styles: [
-          // { "featureType": "water", "elementType": "geometry", "stylers": [{ "color": "#e9e9e9" }, { "lightness": 17 }] },
-          // { "featureType": "landscape", "elementType": "geometry", "stylers": [{ "color": "#f5f5f5" }, { "lightness": 20 }] },
-          // { "featureType": "road.highway", "elementType": "geometry.fill", "stylers": [{ "color": "#ffffff" }, { "lightness": 17 }] },
-          // { "featureType": "road.highway", "elementType": "geometry.stroke", "stylers": [{ "color": "#ffffff" }, { "lightness": 29 }, { "weight": 0.2 }] },
-          // { "featureType": "road.arterial", "elementType": "geometry", "stylers": [{ "color": "#ffffff" }, { "lightness": 18 }] },
-          // { "featureType": "road.local", "elementType": "geometry", "stylers": [{ "color": "#ffffff" }, { "lightness": 16 }] },
-          // { "featureType": "poi", "elementType": "geometry", "stylers": [{ "color": "#f5f5f5" }, { "lightness": 21 }] },
-          // { "featureType": "poi.park", "elementType": "geometry", "stylers": [{ "color": "#dedede" }, { "lightness": 21 }] },
-          // { "elementType": "labels.text.stroke", "stylers": [{ "visibility": "on" }, { "color": "#ffffff" }, { "lightness": 16 }] },
-          // { "elementType": "labels.text.fill", "stylers": [{ "saturation": 36 }, { "color": "#333333" }, { "lightness": 40 }] }, { "elementType": "labels.icon", "stylers": [{ "visibility": "off" }] },
-          // { "featureType": "transit", "elementType": "geometry", "stylers": [{ "color": "#f2f2f2" }, { "lightness": 19 }] },
-          // { "featureType": "administrative", "elementType": "geometry.fill", "stylers": [{ "color": "#fefefe" }, { "lightness": 20 }] },
-          // { "featureType": "administrative", "elementType": "geometry.stroke", "stylers": [{ "color": "#fefefe" }, { "lightness": 17 }, { "weight": 1.2 }] }
-          // { "featureType": "poi", stylers: [{ visibility: "off" }] }
           {
             "featureType": "administrative",
             "elementType": "geometry",
@@ -208,80 +137,13 @@ export class HomePage {
         scaleControl: true,
       });
 
-      let markers = [];
-      for (let regional of this.regionals) {
-        regional.distance = 0;
-        regional.visible = false;
-        regional.current = false;
-
-        let markerData = {
-          position: {
-            lat: regional.latitude,
-            lng: regional.longitude
-          },
-          map: this.map,
-          title: regional.title,
-        };
-
-        regional.marker = new google.maps.Marker(markerData);
-        markers.push(regional.marker);
-
-        regional.marker.addListener('click', () => {
-          for (let c of this.regionals) {
-            c.current = false;
-            //c.infoWindow.close();
-          }
-          this.currentregional = regional;
-          regional.current = true;
-
-          //regional.infoWindow.open(this.map, regional.marker);
-          this.map.panTo(regional.marker.getPosition());
-        });
-      }
-
-      // new MarkerClusterer(this.map, markers, {
-      //   styles: [
-      //     {
-      //       height: 53,
-      //       url: "assets/img/cluster/MapMarkerJS.png",
-      //       width: 53,
-      //       textColor: '#000'
-      //     },
-      //     {
-      //       height: 56,
-      //       url: "assets/img/cluster/MapMarkerJS.png",
-      //       width: 56,
-      //       textColor: '#000'
-      //     },
-      //     {
-      //       height: 66,
-      //       url: "assets/img/cluster/MapMarkerJS.png",
-      //       width: 66,
-      //       textColor: '#000'
-      //     },
-      //     {
-      //       height: 78,
-      //       url: "assets/img/cluster/MapMarkerJS.png",
-      //       width: 78,
-      //       textColor: '#000'
-      //     },
-      //     {
-      //       height: 90,
-      //       url: "assets/img/cluster/MapMarkerJS.png",
-      //       width: 90,
-      //       textColor: '#000'
-      //     }
-      //   ]
-      // });
-
-
-
+      this.markers = this.places.map((place) => this.addMarkerWithWindow(place, this.map));
 
       google.maps.event.addListenerOnce(this.map, 'idle', () => {
         google.maps.event.trigger(this.map, 'resize');
         mapEle.classList.add('show-map');
-        this.bounceMap(markers);
-        this.getCurrentPositionfromStorage(markers)
+        this.bounceMap(this.markers);
+        // this.getCurrentPositionfromStorage(markers)
       });
 
       google.maps.event.addListener(this.map, 'bounds_changed', () => {
@@ -290,8 +152,14 @@ export class HomePage {
         });
       });
 
-
+      document.getElementById('search-form').onsubmit = () => {
+        this.mapSearch(document.getElementById('search-input').value);
+      };
     });
+  }
+
+  markerTapped() {
+    this.nav.push(PlacePage, selectedPlace);
   }
 
   //Center zoom
@@ -312,152 +180,190 @@ export class HomePage {
     }, 200);
   }
 
-  getCurrentPositionfromStorage(markers) {
-    this.storage.get('lastLocation').then((result) => {
-      if (result) {
-        let myPos = new google.maps.LatLng(result.lat, result.long);
-        this.map.setOptions({
-          center: myPos,
-          zoom: 14
-        });
-        let marker = this.addMarker(myPos, "My last saved Location: " + result.location);
+  addMarkerWithWindow(place, map) {
+    place.marker = new google.maps.Marker({
+      position: {
+        lat: place.latitude,
+        lng: place.longitude
+      },
+      map: map,
+      title: place.title,
+    });
+    this.addInfoWindow(place);
+    return place.marker;
+  }
 
-        markers.push(marker);
-        this.bounceMap(markers);
+  addInfoWindow(place) {
+    let contentString = '<div id="info-window-content">'+
+        '<h4 id="title">'+
+        place.title +
+        '</h4>'+
+        '<button ion-button color="primary" id="toPlacePage" onclick="">More</button>'
+        '</div>';
+    let infowindow = new google.maps.InfoWindow({
+      content: contentString
+    });
 
-        this.resizeMap();
+    place.marker.addListener('click', () => {
+      if (infoWindow) {
+        infoWindow.close();
       }
+      infoWindow = infowindow;
+      infoWindow.open(this.map, place.marker);
+      selectedPlace = place;
+
+      document.getElementById("toPlacePage").addEventListener("click", () => {
+        document.getElementById("hiddenButton").click();
+      });
     });
   }
 
-  showToast(message) {
-    let toast = this.toastCtrl.create({
-      message: message,
-      duration: 3000
-    });
-    toast.present();
+  mapSearch(query) {
+    console.log(query);
+    console.log(this.markers);
   }
 
-  choosePosition() {
-    this.storage.get('lastLocation').then((result) => {
-      if (result) {
-        let actionSheet = this.actionSheetCtrl.create({
-          title: 'Last Location: ' + result.location,
-          buttons: [
-            {
-              text: 'Reload',
-              handler: () => {
-                this.getCurrentPosition();
-              }
-            },
-            {
-              text: 'Delete',
-              handler: () => {
-                this.storage.set('lastLocation', null);
-                this.showToast('Location deleted!');
-                this.initializeMap();
-              }
-            },
-            {
-              text: 'Cancel',
-              role: 'cancel',
-              handler: () => {
-              }
-            }
-          ]
-        });
-        actionSheet.present();
-      } else {
-        this.getCurrentPosition();
+    // mapsSearchBar(ev: any) {
+  //   // set input to the value of the searchbar
+  //   //this.search = ev.target.value;
+  //   console.log(ev);
+  //   const autocomplete = new google.maps.places.Autocomplete(ev);
+  //   autocomplete.bindTo('bounds', this.map);
+  //   return new Observable((sub: any) => {
+  //     google.maps.event.addListener(autocomplete, 'place_changed', () => {
+  //       const place = autocomplete.getPlace();
+  //       if (!place.geometry) {
+  //         sub.error({
+  //           message: 'Autocomplete returned place with no geometry'
+  //         });
+  //       } else {
+  //         sub.next(place.geometry.location);
+  //         sub.complete();
+  //       }
+  //     });
+  //   });
+  // }
 
-      }
-    });
-  }
+  // initAutocomplete(): void {
+  //   // reference : https://github.com/driftyco/ionic/issues/7223
+  //   this.addressElement = this.searchbar.nativeElement.querySelector('.searchbar-input');
+  //   this.createAutocomplete(this.addressElement).subscribe((location) => {
+  //     console.log('Searchdata', location);
+
+  //     let options = {
+  //       center: location,
+  //       zoom: 10
+  //     };
+  //     this.map.setOptions(options);
+  //     this.addMarker(location, "Mein gesuchter Standort");
+
+  //   });
+  // }
+
+  // createAutocomplete(addressEl: HTMLInputElement): Observable<any> {
+  //   const autocomplete = new google.maps.places.Autocomplete(addressEl);
+  //   autocomplete.bindTo('bounds', this.map);
+  //   return new Observable((sub: any) => {
+  //     google.maps.event.addListener(autocomplete, 'place_changed', () => {
+  //       const place = autocomplete.getPlace();
+  //       if (!place.geometry) {
+  //         sub.error({
+  //           message: 'Autocomplete returned place with no geometry'
+  //         });
+  //       } else {
+  //         console.log('Search Lat', place.geometry.location.lat());
+  //         console.log('Search Lng', place.geometry.location.lng());
+  //         sub.next(place.geometry.location);
+  //         //sub.complete();
+  //       }
+  //     });
+  //   });
+  // }
+
+  // getCurrentPositionfromStorage(markers) {
+  //   this.storage.get('lastLocation').then((result) => {
+  //     if (result) {
+  //       let myPos = new google.maps.LatLng(result.lat, result.long);
+  //       this.map.setOptions({
+  //         center: myPos,
+  //         zoom: 14
+  //       });
+  //       let marker = this.addMarker(myPos, "My last saved Location: " + result.location);
+
+  //       markers.push(marker);
+  //       this.bounceMap(markers);
+
+  //       this.resizeMap();
+  //     }
+  //   });
+  // }
 
   // go show currrent location
-  getCurrentPosition() {
-    this.loading = this.loadingCtrl.create({
-      content: 'Searching Location ...'
-    });
-    this.loading.present();
+  // getCurrentPosition() {
+  //   this.loading = this.loadingCtrl.create({
+  //     content: 'Searching Location ...'
+  //   });
+  //   this.loading.present();
 
-    let locationOptions = { timeout: 10000, enableHighAccuracy: true };
+  //   let locationOptions = { timeout: 10000, enableHighAccuracy: true };
 
-    this.geolocation.getCurrentPosition(locationOptions).then(
-      (position) => {
-        this.loading.dismiss().then(() => {
+  //   this.geolocation.getCurrentPosition(locationOptions).then(
+  //     (position) => {
+  //       this.loading.dismiss().then(() => {
 
-          this.showToast('Location found!');
+  //         this.showToast('Location found!');
 
-          console.log(position.coords.latitude, position.coords.longitude);
-          let myPos = new google.maps.LatLng(position.coords.latitude, position.coords.longitude);
-          let options = {
-            center: myPos,
-            zoom: 14
-          };
-          this.map.setOptions(options);
-          this.addMarker(myPos, "Mein Standort!");
+  //         console.log(position.coords.latitude, position.coords.longitude);
+  //         let myPos = new google.maps.LatLng(position.coords.latitude, position.coords.longitude);
+  //         let options = {
+  //           center: myPos,
+  //           zoom: 14
+  //         };
+  //         this.map.setOptions(options);
+  //         this.addMarker(myPos, "Mein Standort!");
 
-          let alert = this.alertCtrl.create({
-            title: 'Location',
-            message: 'Do you want to save the Location?',
-            buttons: [
-              {
-                text: 'Cancel'
-              },
-              {
-                text: 'Save',
-                handler: data => {
-                  let lastLocation = { lat: position.coords.latitude, long: position.coords.longitude };
-                  console.log(lastLocation);
-                  this.storage.set('lastLocation', lastLocation).then(() => {
-                    this.showToast('Location saved');
-                  });
-                }
-              }
-            ]
-          });
-          alert.present();
+  //         let alert = this.alertCtrl.create({
+  //           title: 'Location',
+  //           message: 'Do you want to save the Location?',
+  //           buttons: [
+  //             {
+  //               text: 'Cancel'
+  //             },
+  //             {
+  //               text: 'Save',
+  //               handler: data => {
+  //                 let lastLocation = { lat: position.coords.latitude, long: position.coords.longitude };
+  //                 console.log(lastLocation);
+  //                 this.storage.set('lastLocation', lastLocation).then(() => {
+  //                   this.showToast('Location saved');
+  //                 });
+  //               }
+  //             }
+  //           ]
+  //         });
+  //         alert.present();
 
-        });
-      },
-      (error) => {
-        this.loading.dismiss().then(() => {
-          this.showToast('Location not found. Please enable your GPS!');
+  //       });
+  //     },
+  //     (error) => {
+  //       this.loading.dismiss().then(() => {
+  //         this.showToast('Location not found. Please enable your GPS!');
 
-          console.log(error);
-        });
-      }
-    )
-  }
+  //         console.log(error);
+  //       });
+  //     }
+  //   )
+  // }
 
-  toggleSearch() {
-    if (this.search) {
-      this.search = false;
-    } else {
-      this.search = true;
-    }
-  }
+  // showToast(message) {
+  //   let toast = this.toastCtrl.create({
+  //     message: message,
+  //     duration: 3000
+  //   });
+  //   toast.present();
+  // }
 
-  addMarker(position, content) {
-    let marker = new google.maps.Marker({
-      map: this.map,
-      animation: google.maps.Animation.DROP,
-      position: position
-    });
-
-    this.addInfoWindow(marker, content);
-    return marker;
-  }
-
-  addInfoWindow(marker, content) {
-    let infoWindow = new google.maps.InfoWindow({
-      content: content
-    });
-
-    google.maps.event.addListener(marker, 'click', () => {
-      infoWindow.open(this.map, marker);
-    });
-  }
-
+  // viewPlace(id) {
+  //   console.log('Clicked Marker', id);
+  // }
 }

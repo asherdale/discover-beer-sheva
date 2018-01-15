@@ -50,4 +50,29 @@ page-home {
             padding: 0;
         }
     }
+    #search-div {
+        position: absolute;
+        z-index: 13;
+        margin: 5% 3% 0 3%;
+        width: 94%;
+        background-color: white;
+        padding: 1%;
+        input {
+            margin: 0 5% 0 5%;
+            border: 0;
+            padding: 0;
+            float: left;
+            height: 30px;
+            width: 70%;
+            font-size: 12px;
+        }
+        button {
+            margin: 0;
+            width: 10%;
+            float: left;
+            height: 30px;
+            background-color: white;
+            color: #646464;
+        }
+    }
 }
