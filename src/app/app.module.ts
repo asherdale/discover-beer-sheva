@@ -5,6 +5,7 @@ import { BrowserModule } from '@angular/platform-browser';
 
 import { MyApp } from './app.component';
 import { HomePage } from '../pages/home/home';
+import { PlacePage } from '../pages/place/place';
 import { IonicStorageModule } from '@ionic/storage';
 
 import { Geolocation } from '@ionic-native/geolocation';
@@ -16,7 +17,8 @@ import { StatusBar } from '@ionic-native/status-bar';
 @NgModule({
   declarations: [
     MyApp,
-    HomePage
+    HomePage,
+    PlacePage
   ],
   imports: [
     BrowserModule,
@@ -26,7 +28,8 @@ import { StatusBar } from '@ionic-native/status-bar';
   bootstrap: [IonicApp],
   entryComponents: [
     MyApp,
-    HomePage
+    HomePage,
+    PlacePage
   ],
   providers: [
     StatusBar,

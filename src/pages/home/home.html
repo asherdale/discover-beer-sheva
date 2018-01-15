@@ -42,8 +42,24 @@
     </ion-list>
   </div> -->
 
-  <div class="map" [class.hidemap]="!((switch == 'map') || error)">
-    <ion-searchbar #searchbar placeholder="Suchen" [hidden]="!search"></ion-searchbar>
+  <div class="map">
+    <!-- <ion-searchbar #searchbar placeholder="Suchen" [hidden]="!search"></ion-searchbar> -->
     <div id="map" #map></div>
+
+    <div id="search-div">
+      <button ion-button menuToggle color="light">
+        <ion-icon name="md-menu"></ion-icon>
+      </button>
+
+      <form id="search-form">
+        <input id="search-input" type="text" placeholder="Search Be'er Sheva">
+      </form>
+
+      <button ion-button>
+        <ion-icon name="options"></ion-icon>
+      </button>
+    </div>
+
+    <button ion-button id="hiddenButton" style="visibility: hidden" (click)="markerTapped()" ></button>
   </div>
 </ion-content>
