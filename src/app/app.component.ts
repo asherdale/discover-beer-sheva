@@ -15,6 +15,7 @@ export class MyApp {
   @ViewChild(Nav) nav: Nav;
 
   rootPage = HomePage;
+  pages = [];
 
   constructor(platform: Platform, public SplashScreen: SplashScreen, public StatusBar: StatusBar, public menu: MenuController) {
     platform.ready().then(() => {

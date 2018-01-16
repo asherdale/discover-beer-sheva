@@ -1,17 +1,15 @@
-import { identifierModuleUrl } from '@angular/compiler/compiler';
+// import { identifierModuleUrl } from '@angular/compiler/compiler';
+// import { Observable } from 'rxjs/Observable';
+// import { Storage } from '@ionic/storage';
 import { Component, NgZone, ViewChild, ElementRef } from '@angular/core';
 import { ActionSheetController, AlertController, App, LoadingController, NavController, Platform, ToastController } from 'ionic-angular';
 import { Geolocation } from '@ionic-native/geolocation';
 
-import { Observable } from 'rxjs/Observable';
-import { Storage } from '@ionic/storage';
-
+import { PopoverController } from 'ionic-angular';
+// import { MyPopOverPage } from './my-pop-over';
 import { PlacePage } from '../place/place';
 
 declare var google: any;
-declare const jQuery: any;
-let infoWindow = null;
-let selectedPlace = null;
 
 @Component({
   selector: 'page-home',
@@ -22,18 +20,14 @@ export class HomePage {
   // @ViewChild('searchbar', { read: ElementRef }) searchbar: ElementRef;
   addressElement: HTMLInputElement = null;
 
-  listSearch: string = '';
-
   map: any;
-  marker: any;
   loading: any;
-  search: boolean = false;
   error: any;
-  switch: string = "map";
+  currentregional: any;
 
   places: any = [];
-  markers: any = [];
-  currentregional: any;
+  infoWindow: any = null;
+  selectedPlace: any = null;
 
   constructor(
     public loadingCtrl: LoadingController,
@@ -43,9 +37,10 @@ export class HomePage {
     public zone: NgZone,
     public platform: Platform,
     public alertCtrl: AlertController,
-    public storage: Storage,
+    // public storage: Storage,
     public actionSheetCtrl: ActionSheetController,
-    public geolocation: Geolocation
+    public geolocation: Geolocation,
+    public popoverCtrl: PopoverController
   ) {
     this.platform.ready().then(() => this.loadMaps());
     this.places = [{
@@ -137,12 +132,12 @@ export class HomePage {
         scaleControl: true,
       });
 
-      this.markers = this.places.map((place) => this.addMarkerWithWindow(place, this.map));
+      const markers = this.places.map((place) => this.addMarkerWithWindow(place, this.map));
 
       google.maps.event.addListenerOnce(this.map, 'idle', () => {
         google.maps.event.trigger(this.map, 'resize');
         mapEle.classList.add('show-map');
-        this.bounceMap(this.markers);
+        this.bounceMap(markers);
         // this.getCurrentPositionfromStorage(markers)
       });
 
@@ -152,14 +147,62 @@ export class HomePage {
         });
       });
 
+      const menuButton = document.getElementById('menu-button');
+      const arrowButton = document.getElementById('arrow-button');
+      const optionsButton = document.getElementById('options-button');
+      const clearButton = document.getElementById('clear-button');
+      const searchInput = document.getElementById('search-input');
+
       document.getElementById('search-form').onsubmit = () => {
-        this.mapSearch(document.getElementById('search-input').value);
+        this.mapSearch(searchInput.value);
       };
+
+      searchInput.onfocus = () => {
+        this.setDisplay(menuButton, 'none', arrowButton, 'block');
+        if (searchInput.value.length > 0) {
+          this.setDisplay(optionsButton, 'none', clearButton, 'block');
+        } else {
+          this.setDisplay(clearButton, 'none', optionsButton, 'block');
+        }
+      };
+
+      // searchInput.onfocusout = () => {
+      //   console.log('search focusout');
+      //   // menuButton.style.display = 'block';
+      //   // arrowButton.style.display = 'none';
+      //   this.setDisplay(arrowButton, 'none', menuButton, 'block');
+      //   // optionsButton.style.display = 'block';
+      //   // clearButton.style.display = 'none';
+      //   this.setDisplay(clearButton, 'none', optionsButton, 'block');
+      // };
+
+      arrowButton.onclick = () => {
+        searchInput.blur();
+        searchInput.value = '';
+        this.setDisplay(arrowButton, 'none', menuButton, 'block');
+        this.setDisplay(clearButton, 'none', optionsButton, 'block');
+      };
+
+      clearButton.onclick = () => {
+        searchInput.value = '';
+        searchInput.focus();
+        this.setDisplay(clearButton, 'none', optionsButton, 'block');
+      };
+
+      const homePage = this;
+      searchInput.addEventListener('input', function (evt) {
+        if (this.value.length > 0) {
+          homePage.setDisplay(optionsButton, 'none', clearButton, 'block');
+        } else {
+          homePage.setDisplay(clearButton, 'none', optionsButton, 'block');
+        }
+      });
     });
   }
 
-  markerTapped() {
-    this.nav.push(PlacePage, selectedPlace);
+  setDisplay(icon1, display1, icon2, display2) {
+    icon1.style.display = display1;
+    icon2.style.display = display2;
   }
 
   //Center zoom
@@ -200,27 +243,98 @@ export class HomePage {
         '</h4>'+
         '<button ion-button color="primary" id="toPlacePage" onclick="">More</button>'
         '</div>';
-    let infowindow = new google.maps.InfoWindow({
+    place.infowindow = new google.maps.InfoWindow({
       content: contentString
     });
 
     place.marker.addListener('click', () => {
-      if (infoWindow) {
-        infoWindow.close();
-      }
-      infoWindow = infowindow;
-      infoWindow.open(this.map, place.marker);
-      selectedPlace = place;
+      this.openInfoWindow(place);
+    });
+      
+  }
 
-      document.getElementById("toPlacePage").addEventListener("click", () => {
-        document.getElementById("hiddenButton").click();
-      });
+  openInfoWindow(place) {
+    this.closeInfoWindow();
+    this.selectedPlace = place;
+    this.selectedPlace.infowindow.open(this.map, place.marker);
+
+    document.getElementById("toPlacePage").addEventListener("click", () => {
+      document.getElementById("hiddenButton").click();
     });
   }
 
+  closeInfoWindow() {
+    if (this.selectedPlace && this.selectedPlace.infowindow) {
+      this.selectedPlace.infowindow.close();
+    }
+  }
+
+  toPlacePage() {
+    this.nav.push(PlacePage, this.selectedPlace);
+  }
+
   mapSearch(query) {
-    console.log(query);
-    console.log(this.markers);
+    this.closeInfoWindow();
+    this.clearMarkers();
+
+    const results = [];
+    this.places.forEach((place) => {
+      if (this.placeMatchesQuery(place, query)) {
+        place.marker.setMap(this.map);
+        results.push(place);
+      }
+    });
+
+    
+    if (results.length == 1) {
+      this.openInfoWindow(results[0]);
+      this.map.setCenter({lat: results[0].latitude, lng: results[0].longitude}); 
+      this.map.setZoom(16);
+    } else if (results.length > 0) {
+      this.bounceMap(this.getAttributeFromPlaces(results, 'marker'));
+    } else {
+      this.showToast("No results found.");
+      this.showMarkers();
+      this.bounceMap(this.getAttributeFromPlaces(this.places, 'marker'));
+    }
+  }
+
+  placeMatchesQuery(place, query) {
+    return place.title.toLowerCase().includes(query.toLowerCase());
+  }
+
+  // Sets the map on all markers in the array.
+  setMapOnAll(map) {
+    for (var i = 0; i < this.places.length; i++) {
+      this.places[i].marker.setMap(map);
+    }
+  }
+
+  // Removes the markers from the map, but keeps them in the array.
+  clearMarkers() {
+    this.setMapOnAll(null);
+  }
+
+  // Shows any markers currently in the array.
+  showMarkers() {
+    this.setMapOnAll(this.map);
+  }
+
+  showToast(message) {
+    let toast = this.toastCtrl.create({
+      message: message,
+      duration: 3000
+    });
+    toast.present();
+  }
+
+  getAttributeFromPlaces(places, attr) {
+    return places.map((place) => place[attr]);
+  }
+
+  presentPopover() {
+    const popover = this.popoverCtrl.create(filterPopover);
+    popover.present();
   }
 
     // mapsSearchBar(ev: any) {
@@ -353,14 +467,6 @@ export class HomePage {
   //       });
   //     }
   //   )
-  // }
-
-  // showToast(message) {
-  //   let toast = this.toastCtrl.create({
-  //     message: message,
-  //     duration: 3000
-  //   });
-  //   toast.present();
   // }
 
   // viewPlace(id) {
