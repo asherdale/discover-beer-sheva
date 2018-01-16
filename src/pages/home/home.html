@@ -47,19 +47,27 @@
     <div id="map" #map></div>
 
     <div id="search-div">
-      <button ion-button menuToggle color="light">
+      <button id="menu-button" ion-button menuToggle color="light">
         <ion-icon name="md-menu"></ion-icon>
+      </button>
+
+      <button id="arrow-button" ion-button>
+        <ion-icon name="arrow-back"></ion-icon>
       </button>
 
       <form id="search-form">
         <input id="search-input" type="text" placeholder="Search Be'er Sheva">
       </form>
 
-      <button ion-button>
+      <button id="options-button" ion-button>
         <ion-icon name="options"></ion-icon>
+      </button>
+
+      <button id="clear-button" ion-button>
+        <ion-icon name="md-close"></ion-icon>
       </button>
     </div>
 
-    <button ion-button id="hiddenButton" style="visibility: hidden" (click)="markerTapped()" ></button>
+    <button ion-button id="hiddenButton" style="visibility: hidden" (click)="toPlacePage()" ></button>
   </div>
 </ion-content>
