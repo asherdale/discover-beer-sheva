@@ -67,22 +67,6 @@ export class HomePage {
     }
   }
 
-  errorAlert(title, message) {
-    let alert = this.alertCtrl.create({
-      title: title,
-      message: message,
-      buttons: [
-        {
-          text: 'OK',
-          handler: data => {
-            this.loadMaps();
-          }
-        }
-      ]
-    });
-    alert.present();
-  }
-
   initializeMap() {
     this.zone.run(() => {
       var mapEle = this.mapElement.nativeElement;
@@ -146,8 +130,27 @@ export class HomePage {
           this.resizeMap();
         });
       });
+    });
+  }
 
-      const menuButton = document.getElementById('menu-button');
+  errorAlert(title, message) {
+    let alert = this.alertCtrl.create({
+      title: title,
+      message: message,
+      buttons: [
+        {
+          text: 'OK',
+          handler: data => {
+            this.loadMaps();
+          }
+        }
+      ]
+    });
+    alert.present();
+  }
+
+  ionViewDidLoad() {
+    const menuButton = document.getElementById('menu-button');
       const arrowButton = document.getElementById('arrow-button');
       const optionsButton = document.getElementById('options-button');
       const clearButton = document.getElementById('clear-button');
@@ -197,7 +200,6 @@ export class HomePage {
           homePage.setDisplay(clearButton, 'none', optionsButton, 'block');
         }
       });
-    });
   }
 
   setDisplay(icon1, display1, icon2, display2) {
