@@ -6,6 +6,10 @@ import { StatusBar } from '@ionic-native/status-bar';
 
 
 import { HomePage } from '../pages/home/home';
+import { AboutPage } from '../pages/about/about';
+import { AlertPage } from '../pages/alert/alert';
+import { SettingsPage } from '../pages/settings/settings';
+
 
 
 @Component({
@@ -26,7 +30,11 @@ export class MyApp {
     });
 
     this.pages = [
-      { title: 'Home', component: HomePage }
+      { title: 'Home', component: HomePage },
+      { title: 'About', component: AboutPage },
+      { title: 'Alert', component: AlertPage },
+      { title: 'Settings', component: SettingsPage },
+
     ];
   }
 
