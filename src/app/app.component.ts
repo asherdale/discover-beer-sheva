@@ -15,6 +15,7 @@ export class MyApp {
   @ViewChild(Nav) nav: Nav;
 
   rootPage = HomePage;
+  pages: Array<{title: string, component: any}>;
 
   constructor(platform: Platform, public SplashScreen: SplashScreen, public StatusBar: StatusBar, public menu: MenuController) {
     platform.ready().then(() => {
@@ -23,6 +24,10 @@ export class MyApp {
       this.StatusBar.styleDefault();
       this.SplashScreen.hide();
     });
+
+    this.pages = [
+      { title: 'Home', component: HomePage }
+    ];
   }
 
   openPage(page) {
