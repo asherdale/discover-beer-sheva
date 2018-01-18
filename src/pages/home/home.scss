@@ -50,37 +50,4 @@ page-home {
             padding: 0;
         }
     }
-    #search-div {
-        position: absolute;
-        z-index: 13;
-        margin: 2.5% 2% 0 2%;
-        width: 96%;
-        background-color: white;
-        padding: 1%;
-        border-radius: 3px;
-        box-shadow: 0 2px 4px rgba(0,0,0,0.2), 0 -1px 0px rgba(0,0,0,0.02);
-        $control-height: 40px;
-        input {
-            margin: 0 5% 0 5%;
-            border: 0;
-            padding: 0;
-            float: left;
-            height: $control-height;
-            width: 60%;
-            font-size: 16px;
-        }
-        button {
-            margin: 0;
-            width: 15%;
-            float: left;
-            height: $control-height;
-            background-color: white;
-            color: #646464;
-            font-size: 1.4em;
-        }
-        #arrow-button, #clear-button {
-            display: none;
-        }
-    }
-    
 }
