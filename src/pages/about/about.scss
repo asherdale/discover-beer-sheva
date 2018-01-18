@@ -1,3 +1,20 @@
 page-about {
-
+  @import url('https://fonts.googleapis.com/css?family=Alegreya|Poppins|Tenor+Sans');
+  .toolbar-background-md {
+      background-image: url('http://www.webdesignhot.com/wp-content/uploads/2012/05/Abstract-Swirl-Floral-Background-Vector-Graphic.jpg');
+      background-size: cover;
+    }
+    .toolbar-title-md{
+      font-size: 26px;
+      font-family:  'Tenor Sans', sans-serif;
+      text-shadow: 2px 2px black;
+      color: white;
+      text-align: right;
+    }
+    h2{
+      font-family: 'Poppins', sans-serif;
+    }
+    h4{
+      font-family:'Alegreya', serif;
+    }
 }
