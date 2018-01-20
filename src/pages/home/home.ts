@@ -101,7 +101,20 @@ export class HomePage {
           this.resizeMap();
         });
       });
+
+      try{
+        //this.geolocation.watchPosition().subscribe(data => this.panTo(data));
+        this.geolocation.getCurrentPosition().then(data => this.panTo(data));
+      }
+      catch (e){
+        this.showToast("Unable to pan to location");
+      }
     });
+  }
+
+  panTo(data){
+    console.log(data);
+    this.map.panTo(new google.maps.LatLng(data.coords.latitude, data.coords.longitude));
   }
 
   errorAlert(title, message) {
