@@ -82,5 +82,19 @@ page-home {
             display: none;
         }
     }
-    
+    #toPlacePage {
+        border-radius: 4px;
+        height: 2em;
+        font-size: 1rem;
+        color: #fff;
+        background-color: #488aff;
+        padding: 0 1em;
+    }
+    #locate-button {
+        ion-icon {
+            color: #488aff;
+        }
+        margin-bottom: 30%;
+        margin-right: 20%;
+    }
 }

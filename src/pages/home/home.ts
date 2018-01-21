@@ -2,11 +2,12 @@
 // import { Observable } from 'rxjs/Observable';
 // import { Storage } from '@ionic/storage';
 import { Component, NgZone, ViewChild, ElementRef } from '@angular/core';
-import { ActionSheetController, AlertController, App, LoadingController, NavController, Platform, ToastController } from 'ionic-angular';
+import { ActionSheetController, AlertController, App, LoadingController, NavController, Platform, ToastController, Events } from 'ionic-angular';
 import { Geolocation } from '@ionic-native/geolocation';
+import { GoogleAnalytics } from '@ionic-native/google-analytics';
 
 import { PopoverController } from 'ionic-angular';
-// import { MyPopOverPage } from './my-pop-over';
+import { PopoverPage } from './popover';
 import { PlacePage } from '../place/place';
 
 declare var google: any;
@@ -17,7 +18,6 @@ declare var google: any;
 })
 export class HomePage {
   @ViewChild('map') mapElement: ElementRef;
-  // @ViewChild('searchbar', { read: ElementRef }) searchbar: ElementRef;
   addressElement: HTMLInputElement = null;
 
   map: any;
@@ -28,6 +28,8 @@ export class HomePage {
   places: any = [];
   infoWindow: any = null;
   selectedPlace: any = null;
+  userLocation: any = null;
+  selectedFilter: String = "all";
 
   constructor(
     public loadingCtrl: LoadingController,
@@ -40,26 +42,65 @@ export class HomePage {
     // public storage: Storage,
     public actionSheetCtrl: ActionSheetController,
     public geolocation: Geolocation,
-    public popoverCtrl: PopoverController
+    public popoverCtrl: PopoverController,
+    public events: Events,
+    public ga: GoogleAnalytics
   ) {
+    this.ga.startTrackerWithId('UA-112680953-1')
+      .then(() => {
+        console.log('Google analytics is ready now');
+        this.ga.trackView('home');
+      })
+      .catch(e => console.log('Error starting GoogleAnalytics', e));
+
     this.platform.ready().then(() => this.loadMaps());
-    this.places = [{
-      "title": "Performance Rock Beersheba",
-      "latitude": 31.238039,
-      "longitude": 34.793046,
-    }, {
-      "title": "Beit HaBaguette",
-      "latitude": 31.238168,
-      "longitude": 34.792666,
-    }, {
-      "title": "Carraso Science Park",
-      "latitude": 31.241974,
-      "longitude": 34.785521,
-    }];
+    this.places = [
+      {
+        "title": "Performance Rock Beersheba",
+        "latitude": 31.238039,
+        "longitude": 34.793046,
+        "type": "fitness",
+      }, {
+        "title": "Beit HaBaguette",
+        "latitude": 31.238168,
+        "longitude": 34.792666,
+        "type": "bakeries",
+      }, {
+        "title": "Carraso Science Park",
+        "latitude": 31.241974,
+        "longitude": 34.785521,
+        "type": "museums",
+      }, {
+        "title": "Green Falafel",
+        "latitude": 31.238688,
+        "longitude": 34.790921,
+        "type": "restaurants",
+      }, {
+        "title": "Boost Store",
+        "latitude": 31.240898,
+        "longitude": 34.793339,
+        "type": "stores",
+      }, {
+        "title": "Arabica",
+        "latitude": 31.238726,
+        "longitude": 34.787558,
+        "type": "restaurants",
+      }
+    ];
+
+    events.subscribe('filter:changed', (newFilter) => {
+      this.setDisplay(document.getElementById('arrow-button'), 'none', document.getElementById('menu-button'), 'block');
+      if (newFilter === this.selectedFilter) {
+        return;
+      }
+      this.selectedFilter = newFilter;
+      this.filterResults();
+    });
   }
 
   loadMaps() {
-    if (!!google) {
+    var isOnline = window.navigator.onLine;
+    if (isOnline && !!google) {
       this.initializeMap();
       // this.initAutocomplete();
     } else {
@@ -112,8 +153,12 @@ export class HomePage {
         ],
         disableDoubleClickZoom: false,
         disableDefaultUI: true,
-        zoomControl: true,
-        scaleControl: true,
+        zoomControl: false,
+        mapTypeControl: true,
+        mapTypeControlOptions: {
+          position: google.maps.ControlPosition.LEFT_BOTTOM,
+           mapTypeIds: ['roadmap', 'satellite']
+        }
       });
 
       const markers = this.places.map((place) => this.addMarkerWithWindow(place, this.map));
@@ -129,6 +174,10 @@ export class HomePage {
         this.zone.run(() => {
           this.resizeMap();
         });
+      });
+
+      google.maps.event.addListener(this.map, "click", () => {
+        this.closeInfoWindow();
       });
     });
   }
@@ -150,56 +199,55 @@ export class HomePage {
   }
 
   ionViewDidLoad() {
+
     const menuButton = document.getElementById('menu-button');
-      const arrowButton = document.getElementById('arrow-button');
-      const optionsButton = document.getElementById('options-button');
-      const clearButton = document.getElementById('clear-button');
-      const searchInput = document.getElementById('search-input');
-
-      document.getElementById('search-form').onsubmit = () => {
-        this.mapSearch(searchInput.value);
-      };
-
-      searchInput.onfocus = () => {
-        this.setDisplay(menuButton, 'none', arrowButton, 'block');
-        if (searchInput.value.length > 0) {
-          this.setDisplay(optionsButton, 'none', clearButton, 'block');
-        } else {
-          this.setDisplay(clearButton, 'none', optionsButton, 'block');
-        }
-      };
-
-      // searchInput.onfocusout = () => {
-      //   console.log('search focusout');
-      //   // menuButton.style.display = 'block';
-      //   // arrowButton.style.display = 'none';
-      //   this.setDisplay(arrowButton, 'none', menuButton, 'block');
-      //   // optionsButton.style.display = 'block';
-      //   // clearButton.style.display = 'none';
-      //   this.setDisplay(clearButton, 'none', optionsButton, 'block');
-      // };
-
-      arrowButton.onclick = () => {
-        searchInput.blur();
-        searchInput.value = '';
-        this.setDisplay(arrowButton, 'none', menuButton, 'block');
+    const arrowButton = document.getElementById('arrow-button');
+    const optionsButton = document.getElementById('options-button');
+    const clearButton = document.getElementById('clear-button');
+    const searchInput = document.getElementById('search-input');
+    document.getElementById('search-form').onsubmit = () => {
+      this.mapSearch(searchInput.value);
+    }
+    searchInput.onfocus = () => {
+      this.setDisplay(menuButton, 'none', arrowButton, 'block');
+      if (searchInput.value.length > 0) {
+        this.setDisplay(optionsButton, 'none', clearButton, 'block');
+      } else {
         this.setDisplay(clearButton, 'none', optionsButton, 'block');
-      };
+      }
+    }
 
-      clearButton.onclick = () => {
-        searchInput.value = '';
-        searchInput.focus();
-        this.setDisplay(clearButton, 'none', optionsButton, 'block');
-      };
+    // searchInput.onfocusout = () => {
+    //   console.log('search focusout');
+    //   // menuButton.style.display = 'block';
+    //   // arrowButton.style.display = 'none';
+    //   this.setDisplay(arrowButton, 'none', menuButton, 'block');
+    //   // optionsButton.style.display = 'block';
+    //   // clearButton.style.display = 'none';
+    //   this.setDisplay(clearButton, 'none', optionsButton, 'block');
+    // }
 
-      const homePage = this;
-      searchInput.addEventListener('input', function (evt) {
-        if (this.value.length > 0) {
-          homePage.setDisplay(optionsButton, 'none', clearButton, 'block');
-        } else {
-          homePage.setDisplay(clearButton, 'none', optionsButton, 'block');
-        }
-      });
+    arrowButton.onclick = () => {
+      searchInput.blur();
+      searchInput.value = '';
+      this.setDisplay(arrowButton, 'none', menuButton, 'block');
+      this.setDisplay(clearButton, 'none', optionsButton, 'block');
+    }
+    clearButton.onclick = () => {
+      searchInput.value = '';
+      searchInput.focus();
+      this.setDisplay(clearButton, 'none', optionsButton, 'block');
+      this.mapSearch('');
+      this.setDisplay(menuButton, 'none', arrowButton, 'block');
+    }
+    const thisPage = this;
+    searchInput.addEventListener('input', function (evt) {
+      if (this.value.length > 0) {
+        thisPage.setDisplay(optionsButton, 'none', clearButton, 'block');
+      } else {
+        thisPage.setDisplay(clearButton, 'none', optionsButton, 'block');
+      }
+    });
   }
 
   setDisplay(icon1, display1, icon2, display2) {
@@ -233,6 +281,7 @@ export class HomePage {
       },
       map: map,
       title: place.title,
+      animation: google.maps.Animation.DROP,
     });
     this.addInfoWindow(place);
     return place.marker;
@@ -240,10 +289,9 @@ export class HomePage {
 
   addInfoWindow(place) {
     let contentString = '<div id="info-window-content">'+
-        '<h4 id="title">'+
-        place.title +
-        '</h4>'+
-        '<button ion-button color="primary" id="toPlacePage" onclick="">More</button>'
+        `<h6 id="title">${place.title}</h6>`+
+        `<p id="title">${place.type}</p>`+
+        '<button id="toPlacePage">More</button>' +
         '</div>';
     place.infowindow = new google.maps.InfoWindow({
       content: contentString
@@ -252,8 +300,11 @@ export class HomePage {
     place.marker.addListener('click', () => {
       this.openInfoWindow(place);
     });
-      
   }
+
+  // typeToSingular(type) {
+  //   return (!type.endsWith('s') || type.endsWith('ss')) ? type : type.slice(0, -1);
+  // }
 
   openInfoWindow(place) {
     this.closeInfoWindow();
@@ -276,8 +327,11 @@ export class HomePage {
   }
 
   mapSearch(query) {
+    console.log('query');
     this.closeInfoWindow();
     this.clearMarkers();
+    this.selectedFilter = "all";
+    this.setDisplay(document.getElementById('arrow-button'), 'none', document.getElementById('menu-button'), 'block');
 
     const results = [];
     this.places.forEach((place) => {
@@ -334,9 +388,88 @@ export class HomePage {
     return places.map((place) => place[attr]);
   }
 
-  presentPopover() {
-    const popover = this.popoverCtrl.create(filterPopover);
-    popover.present();
+  presentPopover(myEvent) {
+    let popover = this.popoverCtrl.create(PopoverPage, { selectedFilter: this.selectedFilter });
+    popover.present({
+      ev: myEvent
+    });
+  }
+
+  filterResults() {
+    this.closeInfoWindow();
+    this.clearMarkers();
+
+    const results = [];
+    this.places.forEach((place) => {
+      if (place.type == this.selectedFilter) {
+        place.marker.setMap(this.map);
+        results.push(place);
+      }
+    });
+
+    const displayName = this.selectedFilter.charAt(0).toUpperCase() + this.selectedFilter.slice(1);
+    document.getElementById('search-input').value = this.selectedFilter === "all" ? '' : displayName;
+
+    if (results.length == 1) {
+      this.map.setCenter({lat: results[0].latitude, lng: results[0].longitude}); 
+      this.map.setZoom(16);
+    } else if (results.length > 0) {
+      this.bounceMap(this.getAttributeFromPlaces(results, 'marker'));
+    } else {
+      this.showMarkers();
+      this.bounceMap(this.getAttributeFromPlaces(this.places, 'marker'));
+    }
+  }
+
+  locate() {
+    if (this.userLocation && this.userLocation.position) {
+      this.map.setCenter(this.userLocation.position); 
+      this.map.setZoom(16);
+    } else {
+      this.getUserLocation();
+    }
+  }
+
+  // go show currrent location
+  getUserLocation() {
+    this.loading = this.loadingCtrl.create({
+      content: 'Searching Location ...'
+    });
+    this.loading.present();
+
+    const thisPage = this;
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(
+        (position) => {
+          this.loading.dismiss().then(() => {
+            thisPage.showToast('Location found!');
+            thisPage.userLocation = new google.maps.Marker({
+              position: {
+                lat: position.coords.latitude,
+                lng: position.coords.longitude
+              },
+              map: thisPage.map,
+              animation: google.maps.Animation.DROP,
+              icon: '../../assets/img/blue-dot.png',
+            });
+            thisPage.locate();
+            const watchPositionOptions = {
+              enableHighAccuracy: false,
+              timeout: 5000,
+              maximumAge: 0,
+            };
+          });
+        },
+        (error) => {
+          this.loading.dismiss().then(() => {
+            thisPage.showToast('Location not found. Please enable your GPS!');
+            console.log(error);
+          });
+        });
+    } else {
+      this.showToast('Location not found. Please enable your GPS!');
+      console.log('Device/browser doesn\'t support Geolocation');
+    }
   }
 
     // mapsSearchBar(ev: any) {
@@ -394,84 +527,5 @@ export class HomePage {
   //       }
   //     });
   //   });
-  // }
-
-  // getCurrentPositionfromStorage(markers) {
-  //   this.storage.get('lastLocation').then((result) => {
-  //     if (result) {
-  //       let myPos = new google.maps.LatLng(result.lat, result.long);
-  //       this.map.setOptions({
-  //         center: myPos,
-  //         zoom: 14
-  //       });
-  //       let marker = this.addMarker(myPos, "My last saved Location: " + result.location);
-
-  //       markers.push(marker);
-  //       this.bounceMap(markers);
-
-  //       this.resizeMap();
-  //     }
-  //   });
-  // }
-
-  // go show currrent location
-  // getCurrentPosition() {
-  //   this.loading = this.loadingCtrl.create({
-  //     content: 'Searching Location ...'
-  //   });
-  //   this.loading.present();
-
-  //   let locationOptions = { timeout: 10000, enableHighAccuracy: true };
-
-  //   this.geolocation.getCurrentPosition(locationOptions).then(
-  //     (position) => {
-  //       this.loading.dismiss().then(() => {
-
-  //         this.showToast('Location found!');
-
-  //         console.log(position.coords.latitude, position.coords.longitude);
-  //         let myPos = new google.maps.LatLng(position.coords.latitude, position.coords.longitude);
-  //         let options = {
-  //           center: myPos,
-  //           zoom: 14
-  //         };
-  //         this.map.setOptions(options);
-  //         this.addMarker(myPos, "Mein Standort!");
-
-  //         let alert = this.alertCtrl.create({
-  //           title: 'Location',
-  //           message: 'Do you want to save the Location?',
-  //           buttons: [
-  //             {
-  //               text: 'Cancel'
-  //             },
-  //             {
-  //               text: 'Save',
-  //               handler: data => {
-  //                 let lastLocation = { lat: position.coords.latitude, long: position.coords.longitude };
-  //                 console.log(lastLocation);
-  //                 this.storage.set('lastLocation', lastLocation).then(() => {
-  //                   this.showToast('Location saved');
-  //                 });
-  //               }
-  //             }
-  //           ]
-  //         });
-  //         alert.present();
-
-  //       });
-  //     },
-  //     (error) => {
-  //       this.loading.dismiss().then(() => {
-  //         this.showToast('Location not found. Please enable your GPS!');
-
-  //         console.log(error);
-  //       });
-  //     }
-  //   )
-  // }
-
-  // viewPlace(id) {
-  //   console.log('Clicked Marker', id);
   // }
 }
