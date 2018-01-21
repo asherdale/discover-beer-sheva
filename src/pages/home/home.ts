@@ -39,10 +39,26 @@ export class HomePage {
   }
 
   loadMarkers(){
-    this.http.get("http://opendata.br7.org.il/datasets/geojson/cameras.geojson").subscribe(data => {
-      console.log(data);
-      console.log(JSON.parse(data["_body"]));
+    // http://opendata.br7.org.il/datasets/geojson/street_light.geojson
+    // http://opendata.br7.org.il/datasets/geojson/cameras.geojson
+    let load = (name: string) : Promise<{}> => {
+      return new Promise<{}>(resolve => {
+        this.http.get(`http://opendata.br7.org.il/datasets/geojson/${name}.geojson`).subscribe(data => {
+          let r = JSON.parse(data["_body"])["features"];
+          resolve(r);
+        });
+      });
+    };
+
+    load("street_light").then(d => {
+      this.showToast("Loaded street lights");
+      // Insert code to put markers on map here
     });
+
+    load("cameras").then(d => {
+      this.showToast("Loaded security cameras");
+      // Insert code to put markers on map here
+    })
   }
 
   loadMaps() {
