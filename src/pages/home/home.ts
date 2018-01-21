@@ -30,8 +30,18 @@ export class HomePage {
     // public storage: Storage,
     public actionSheetCtrl: ActionSheetController,
     public geolocation: Geolocation,
+    public http: Http
   ) {
-    this.platform.ready().then(() => this.loadMaps());
+    this.platform.ready().then(() => {
+      this.loadMaps();
+      this.loadMarkers();
+    });
+  }
+
+  loadMarkers(){
+    this.http.get("http://opendata.br7.org.il/api/3/action/package_show?id=camera").subscribe(data => {
+
+    });
   }
 
   loadMaps() {
