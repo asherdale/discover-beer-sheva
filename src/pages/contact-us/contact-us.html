@@ -14,5 +14,12 @@
 
 
 <ion-content padding>
+  <form (ngSubmit) = "sendData()">
+  <ion-input class=input id="nameInput" [(ngModel)]="contact.title" type='text' name="contact-name" placeholder='Name'></ion-input>
+  <ion-input class=input id="emailInput" [(ngModel)]="contact.email" type='text' name="contact-email" placeholder='Email'></ion-input>
+  <ion-input class=input id="issueInput" [(ngModel)]="contact.issue" type='text' name="contact-issue" placeholder='Your issue'></ion-input>
+  <ion-input class=input id="msgInput" [(ngModel)]="contact.description" type='text' name="contact-description" value="" full maxLength="500" placeholder="Description"></ion-input>
+    <button ion-button full type="submit">Submit</button>
+  </form>
 
 </ion-content>

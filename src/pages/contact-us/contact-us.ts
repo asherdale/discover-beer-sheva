@@ -13,13 +13,20 @@ import { IonicPage, NavController, NavParams } from 'ionic-angular';
   selector: 'page-contact-us',
   templateUrl: 'contact-us.html',
 })
+
 export class ContactUsPage {
+
+  contact={};
 
   constructor(public navCtrl: NavController, public navParams: NavParams) {
   }
 
   ionViewDidLoad() {
     console.log('ionViewDidLoad ContactUsPage');
+  }
+
+  sendData() {
+    console.log(this.contact)
   }
 
 }
