@@ -16,6 +16,7 @@ export class HomePage {
   loading: any;
   error: any;
   currentregional: any;
+  MYLOC: any;
 
   constructor(
     public loadingCtrl: LoadingController,
@@ -85,8 +86,8 @@ export class HomePage {
         ],
         disableDoubleClickZoom: false,
         disableDefaultUI: true,
-        zoomControl: true,
-        scaleControl: true,
+        zoomControl: false,
+        scaleControl: false,
       });
 
       google.maps.event.addListenerOnce(this.map, 'idle', () => {
@@ -104,20 +105,33 @@ export class HomePage {
 
       try{
         let watch = this.geolocation.watchPosition();
-        watch.subscribe(data => this.panTo(data));
-        this.geolocation.getCurrentPosition().then(data => this.panTo(data));
+        watch.subscribe(data => this.moveTo(data));
+        this.geolocation.getCurrentPosition().then(data => this.moveTo(data));
       }
       catch (e){
         this.showToast("Unable to pan to location");
+        console.error(e);
       }
+
+      this.MYLOC = new google.maps.Marker({
+          clickable: false,
+          icon: new google.maps.MarkerImage('//maps.gstatic.com/mapfiles/mobile/mobileimgs2.png',
+              new google.maps.Size(22, 22),
+              new google.maps.Point(0, 18),
+              new google.maps.Point(11, 11)),
+          shadow: null,
+          zIndex: 999,
+          map: this.map// your google.maps.Map object
+      });
     });
   }
 
-  panTo(data){
+  moveTo(data){
     console.log(data);
     let lg = new google.maps.LatLng(data.coords.latitude, data.coords.longitude);
-    console.log(this.map.panTo);
+    //console.log(this.map.panTo);
     this.map.setCenter(lg);
+    this.MYLOC.setPosition(lg);
   }
 
   errorAlert(title, message) {
