@@ -15,7 +15,7 @@ import { Geolocation } from '@ionic-native/geolocation';
 import { SplashScreen } from '@ionic-native/splash-screen';
 import { StatusBar } from '@ionic-native/status-bar';
 
-
+import { HttpModule } from '@angular/http';
 
 @NgModule({
   declarations: [
@@ -27,6 +27,7 @@ import { StatusBar } from '@ionic-native/status-bar';
   ],
   imports: [
     BrowserModule,
+    HttpModule,
     IonicModule.forRoot(MyApp),
     IonicStorageModule.forRoot()
   ],

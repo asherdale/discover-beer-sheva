@@ -1,6 +1,7 @@
 import { Component, NgZone, ViewChild, ElementRef } from '@angular/core';
 import { ActionSheetController, AlertController, App, LoadingController, NavController, Platform, ToastController } from 'ionic-angular';
 import { Geolocation } from '@ionic-native/geolocation';
+import { Http } from '@angular/http';
 
 declare var google: any;
 
@@ -29,8 +30,35 @@ export class HomePage {
     // public storage: Storage,
     public actionSheetCtrl: ActionSheetController,
     public geolocation: Geolocation,
+    public http: Http
   ) {
-    this.platform.ready().then(() => this.loadMaps());
+    this.platform.ready().then(() => {
+      this.loadMaps();
+      this.loadMarkers();
+    });
+  }
+
+  loadMarkers(){
+    // http://opendata.br7.org.il/datasets/geojson/street_light.geojson
+    // http://opendata.br7.org.il/datasets/geojson/cameras.geojson
+    let load = (name: string) : Promise<{}> => {
+      return new Promise<{}>(resolve => {
+        this.http.get(`http://opendata.br7.org.il/datasets/geojson/${name}.geojson`).subscribe(data => {
+          let r = JSON.parse(data["_body"])["features"];
+          resolve(r);
+        });
+      });
+    };
+
+    load("street_light").then(d => {
+      this.showToast("Loaded street lights");
+      // Insert code to put markers on map here
+    });
+
+    load("cameras").then(d => {
+      this.showToast("Loaded security cameras");
+      // Insert code to put markers on map here
+    })
   }
 
   loadMaps() {
@@ -139,6 +167,21 @@ export class HomePage {
         "lng": this.map.getCenter().lng()
       },
       "data": data
+    });
+  }
+
+  
+  placeMarker(options){
+    var marker = new google.maps.Marker({
+      map: this.map,
+      position: {lat: options.lat || 0, lng: options.long || 0},
+      title: options.title || "",
+      icon: {
+        url: options.url,
+        size: new google.maps.Size(options.size.x, options.size.y),
+        origin: new google.maps.Point(0, 0),
+        anchor: new google.maps.Point(options.size.x / 2, options.size.y)
+      }
     });
   }
 
