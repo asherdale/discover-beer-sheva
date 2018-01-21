@@ -103,7 +103,8 @@ export class HomePage {
       });
 
       try{
-        //this.geolocation.watchPosition().subscribe(data => this.panTo(data));
+        let watch = this.geolocation.watchPosition();
+        watch.subscribe(data => this.panTo(data));
         this.geolocation.getCurrentPosition().then(data => this.panTo(data));
       }
       catch (e){
@@ -114,7 +115,9 @@ export class HomePage {
 
   panTo(data){
     console.log(data);
-    this.map.panTo(new google.maps.LatLng(data.coords.latitude, data.coords.longitude));
+    let lg = new google.maps.LatLng(data.coords.latitude, data.coords.longitude);
+    console.log(this.map.panTo);
+    this.map.setCenter(lg);
   }
 
   errorAlert(title, message) {
