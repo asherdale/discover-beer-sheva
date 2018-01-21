@@ -7,6 +7,9 @@ import { StatusBar } from '@ionic-native/status-bar';
 
 import { HomePage } from '../pages/home/home';
 import { AboutPage } from '../pages/about/about';
+import { AlertPage } from '../pages/alert/alert';
+import { SettingsPage } from '../pages/settings/settings';
+
 
 
 @Component({
@@ -16,7 +19,7 @@ export class MyApp {
   @ViewChild(Nav) nav: Nav;
 
   rootPage = HomePage;
-  pages = [];
+  pages: Array<{title: string, component: any}>;
 
   constructor(platform: Platform, public SplashScreen: SplashScreen, public StatusBar: StatusBar, public menu: MenuController) {
     platform.ready().then(() => {
@@ -24,12 +27,16 @@ export class MyApp {
       // Here you can do any higher level native things you might need.
       this.StatusBar.styleDefault();
       this.SplashScreen.hide();
-
-      this.pages = [
-        { title: 'Map', component: HomePage },
-        { title: 'About', component: AboutPage },
-      ];
     });
+
+    this.pages = [
+      { title: '', component: null },
+      { title: 'Home', component: HomePage },
+      { title: 'About', component: AboutPage },
+      { title: 'Alert', component: AlertPage },
+      { title: 'Settings', component: SettingsPage },
+
+    ];
   }
 
   openPage(page) {

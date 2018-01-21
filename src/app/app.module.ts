@@ -5,8 +5,10 @@ import { BrowserModule } from '@angular/platform-browser';
 
 import { MyApp } from './app.component';
 import { HomePage } from '../pages/home/home';
-import { PlacePage } from '../pages/place/place';
 import { AboutPage } from '../pages/about/about';
+import { AlertPage } from '../pages/alert/alert';
+import { SettingsPage } from '../pages/settings/settings';
+
 import { IonicStorageModule } from '@ionic/storage';
 
 import { Geolocation } from '@ionic-native/geolocation';
@@ -19,8 +21,9 @@ import { StatusBar } from '@ionic-native/status-bar';
   declarations: [
     MyApp,
     HomePage,
-    PlacePage,
-    AboutPage
+    AlertPage,
+    AboutPage,
+    SettingsPage,
   ],
   imports: [
     BrowserModule,
@@ -31,8 +34,9 @@ import { StatusBar } from '@ionic-native/status-bar';
   entryComponents: [
     MyApp,
     HomePage,
-    PlacePage,
-    AboutPage
+    AlertPage,
+    AboutPage,
+    SettingsPage,
   ],
   providers: [
     StatusBar,

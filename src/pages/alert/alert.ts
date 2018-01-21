@@ -2,7 +2,7 @@ import { Component } from '@angular/core';
 import { IonicPage, NavController, NavParams } from 'ionic-angular';
 
 /**
- * Generated class for the PlacePage page.
+ * Generated class for the AlertPage page.
  *
  * See https://ionicframework.com/docs/components/#navigation for more info on
  * Ionic pages and navigation.
@@ -10,18 +10,16 @@ import { IonicPage, NavController, NavParams } from 'ionic-angular';
 
 @IonicPage()
 @Component({
-  selector: 'page-place',
-  templateUrl: 'place.html',
+  selector: 'page-alert',
+  templateUrl: 'alert.html',
 })
-export class PlacePage {
-
-  title: any;
+export class AlertPage {
 
   constructor(public navCtrl: NavController, public navParams: NavParams) {
-  	this.title = navParams.get('title');
   }
 
   ionViewDidLoad() {
-    // console.log('ionViewDidLoad PlacePage');
+    console.log('ionViewDidLoad AlertPage');
   }
+
 }
