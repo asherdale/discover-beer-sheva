@@ -9,6 +9,8 @@ import { HomePage } from '../pages/home/home';
 import { AboutPage } from '../pages/about/about';
 import { AlertPage } from '../pages/alert/alert';
 import { SettingsPage } from '../pages/settings/settings';
+import { ContactUsPage } from '../pages/contact-us/contact-us';
+
 
 
 
@@ -18,7 +20,7 @@ import { SettingsPage } from '../pages/settings/settings';
 export class MyApp {
   @ViewChild(Nav) nav: Nav;
 
-  rootPage = HomePage;
+  rootPage = ContactUsPage;
   pages: Array<{title: string, component: any}>;
 
   constructor(platform: Platform, public SplashScreen: SplashScreen, public StatusBar: StatusBar, public menu: MenuController) {
@@ -35,6 +37,7 @@ export class MyApp {
       { title: 'About', component: AboutPage },
       { title: 'Alert', component: AlertPage },
       { title: 'Settings', component: SettingsPage },
+      { title: 'Contact Us', component: ContactUsPage },
 
     ];
   }

@@ -8,6 +8,8 @@ import { HomePage } from '../pages/home/home';
 import { AboutPage } from '../pages/about/about';
 import { AlertPage } from '../pages/alert/alert';
 import { SettingsPage } from '../pages/settings/settings';
+import { ContactUsPage } from '../pages/contact-us/contact-us';
+
 
 import { IonicStorageModule } from '@ionic/storage';
 
@@ -24,6 +26,7 @@ import { StatusBar } from '@ionic-native/status-bar';
     AlertPage,
     AboutPage,
     SettingsPage,
+    ContactUsPage,
   ],
   imports: [
     BrowserModule,
@@ -37,6 +40,7 @@ import { StatusBar } from '@ionic-native/status-bar';
     AlertPage,
     AboutPage,
     SettingsPage,
+    ContactUsPage,
   ],
   providers: [
     StatusBar,
