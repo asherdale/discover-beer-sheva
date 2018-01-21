@@ -170,6 +170,21 @@ export class HomePage {
     });
   }
 
+  
+  placeMarker(options){
+    var marker = new google.maps.Marker({
+      map: this.map,
+      position: {lat: options.lat || 0, lng: options.long || 0},
+      title: options.title || "",
+      icon: {
+        url: options.url,
+        size: new google.maps.Size(options.size.x, options.size.y),
+        origin: new google.maps.Point(0, 0),
+        anchor: new google.maps.Point(options.size.x / 2, options.size.y)
+      }
+    });
+  }
+
   errorAlert(title, message) {
     let alert = this.alertCtrl.create({
       title: title,
