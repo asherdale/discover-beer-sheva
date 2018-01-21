@@ -129,8 +129,9 @@ export class HomePage {
   moveTo(data){
     console.log(data);
     let lg = new google.maps.LatLng(data.coords.latitude, data.coords.longitude);
-    //console.log(this.map.panTo);
+    this.map.setZoom(20);
     this.map.setCenter(lg);
+    console.log(this.map.getZoom());
     this.MYLOC.setPosition(lg);
   }
 
