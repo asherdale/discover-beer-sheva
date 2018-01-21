@@ -39,8 +39,9 @@ export class HomePage {
   }
 
   loadMarkers(){
-    this.http.get("http://opendata.br7.org.il/api/3/action/package_show?id=camera").subscribe(data => {
-
+    this.http.get("http://opendata.br7.org.il/datasets/geojson/cameras.geojson").subscribe(data => {
+      console.log(data);
+      console.log(JSON.parse(data["_body"]));
     });
   }
 
