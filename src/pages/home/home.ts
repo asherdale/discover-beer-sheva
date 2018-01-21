@@ -127,12 +127,19 @@ export class HomePage {
   }
 
   moveTo(data){
-    console.log(data);
+    //console.log(data);
     let lg = new google.maps.LatLng(data.coords.latitude, data.coords.longitude);
     this.map.setZoom(20);
     this.map.setCenter(lg);
-    console.log(this.map.getZoom());
     this.MYLOC.setPosition(lg);
+    console.log({
+      "zoom": this.map.getZoom(),
+      "location": {
+        "lat": this.map.getCenter().lat(),
+        "lng": this.map.getCenter().lng()
+      },
+      "data": data
+    });
   }
 
   errorAlert(title, message) {
