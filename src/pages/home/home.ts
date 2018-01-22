@@ -1,6 +1,7 @@
 import { Component, NgZone, ViewChild, ElementRef } from '@angular/core';
 import { ActionSheetController, AlertController, App, LoadingController, NavController, Platform, ToastController } from 'ionic-angular';
 import { Geolocation } from '@ionic-native/geolocation';
+import { Http } from '@angular/http';
 
 declare var google: any;
 
@@ -29,8 +30,57 @@ export class HomePage {
     // public storage: Storage,
     public actionSheetCtrl: ActionSheetController,
     public geolocation: Geolocation,
+    public http: Http,
   ) {
-    this.platform.ready().then(() => this.loadMaps());
+    this.platform.ready().then(() => {
+      this.loadMaps();
+      this.loadMarkers();
+    });
+  }
+
+  getCoordinates(x) {
+    var lat = (x.geometry.coordinates[0]/10000);
+    var long =(x.geometry.coordinates[1]/10000);
+
+    return new google.maps.LatLng(lat,long);
+
+  }
+
+  loadMarkers() {
+    // http://opendata.br7.org.il/datasets/geojson/street_light.geojson
+    // http://opendata.br7.org.il/datasets/geojson/cameras.geojson
+    let load = (name: string): Promise<{}> => {
+      return new Promise<{}>(resolve => {
+        this.http.get(`http://opendata.br7.org.il/datasets/geojson/${name}.geojson`).subscribe(data => {
+          let r = JSON.parse(data["_body"])["features"];
+          resolve(r);
+        });
+      });
+    };
+
+
+    load("street_light").then(heatmapData => {
+      this.showToast("Loaded street lights");
+
+      var shitdick = [];
+
+      for (var key in heatmapData){
+        shitdick.push(this.getCoordinates(heatmapData[key]));
+      }
+
+      var heatmap = new google.maps.visualization.HeatmapLayer({
+        data: shitdick
+      });
+
+      heatmap.setMap(this.map);
+
+
+    });
+
+    /*load("cameras").then(d => {
+      this.showToast("Loaded security cameras");
+      // Insert code to put markers on map here
+    })*/
   }
 
   loadMaps() {
@@ -103,30 +153,30 @@ export class HomePage {
         });
       });
 
-      try{
+      try {
         let watch = this.geolocation.watchPosition();
         watch.subscribe(data => this.moveTo(data));
         this.geolocation.getCurrentPosition().then(data => this.moveTo(data));
       }
-      catch (e){
+      catch (e) {
         this.showToast("Unable to pan to location");
         console.error(e);
       }
 
       this.MYLOC = new google.maps.Marker({
-          clickable: false,
-          icon: new google.maps.MarkerImage('//maps.gstatic.com/mapfiles/mobile/mobileimgs2.png',
-              new google.maps.Size(22, 22),
-              new google.maps.Point(0, 18),
-              new google.maps.Point(11, 11)),
-          shadow: null,
-          zIndex: 999,
-          map: this.map// your google.maps.Map object
+        clickable: false,
+        icon: new google.maps.MarkerImage('//maps.gstatic.com/mapfiles/mobile/mobileimgs2.png',
+          new google.maps.Size(22, 22),
+          new google.maps.Point(0, 18),
+          new google.maps.Point(11, 11)),
+        shadow: null,
+        zIndex: 999,
+        map: this.map// your google.maps.Map object
       });
     });
   }
 
-  moveTo(data){
+  moveTo(data) {
     //console.log(data);
     let lg = new google.maps.LatLng(data.coords.latitude, data.coords.longitude);
     this.map.setZoom(20);
@@ -139,6 +189,23 @@ export class HomePage {
         "lng": this.map.getCenter().lng()
       },
       "data": data
+    });
+  }
+
+
+
+
+  placeMarker(options) {
+    var marker = new google.maps.Marker({
+      map: this.map,
+      position: { lat: options.lat || 0, lng: options.long || 0 },
+      title: options.title || "",
+      icon: {
+        url: options.url,
+        size: new google.maps.Size(options.size.x, options.size.y),
+        origin: new google.maps.Point(0, 0),
+        anchor: new google.maps.Point(options.size.x / 2, options.size.y)
+      }
     });
   }
 
