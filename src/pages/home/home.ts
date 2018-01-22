@@ -2,6 +2,8 @@ import { Component, NgZone, ViewChild, ElementRef } from '@angular/core';
 import { ActionSheetController, AlertController, App, LoadingController, NavController, Platform, ToastController } from 'ionic-angular';
 import { Geolocation } from '@ionic-native/geolocation';
 import { Http } from '@angular/http';
+//var UTM = require('utm-latlng');
+import _ from 'utm-latlng';
 
 declare var google: any;
 
