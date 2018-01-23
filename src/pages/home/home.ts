@@ -57,7 +57,19 @@ export class HomePage {
 
     load("cameras").then(d => {
       this.showToast("Loaded security cameras");
-      // Insert code to put markers on map here
+      for (var i = 0; i < d.length; i++){
+        let item = d[i];
+        this.placeMarker({
+          "lat": item.properties.X,
+          "long": item.properties.Y,
+          "title": "Camera",
+          "url": "https://mt.googleapis.com/vt/icon/name=icons/onion/1493-wht-blank_maps-4x.png&filter=ff795046",
+          "size": {
+            "x": 32,
+            "y": 32
+          }
+        });
+      }
     })
   }
 
@@ -170,7 +182,7 @@ export class HomePage {
     });
   }
 
-  
+
   placeMarker(options){
     var marker = new google.maps.Marker({
       map: this.map,
