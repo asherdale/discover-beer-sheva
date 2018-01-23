@@ -2,8 +2,7 @@ import { Component, NgZone, ViewChild, ElementRef } from '@angular/core';
 import { ActionSheetController, AlertController, App, LoadingController, NavController, Platform, ToastController } from 'ionic-angular';
 import { Geolocation } from '@ionic-native/geolocation';
 import { Http } from '@angular/http';
-//var UTM = require('utm-latlng');
-import _ from 'utm-latlng';
+var utmObj = require('utm-latlng');
 
 declare var google: any;
 
@@ -41,11 +40,11 @@ export class HomePage {
   }
 
   getCoordinates(x) {
-    var lat = (x.geometry.coordinates[0]/10000);
-    var long =(x.geometry.coordinates[1]/10000);
+    const utm = new utmObj('International');
+    //https://en.wikipedia.org/wiki/File:LA2-Africa-UTM-zones.png
+    let temp = utm.convertUtmToLatLng(x.geometry.coordinates[0], x.geometry.coordinates[1], 36, "R");
 
-    return new google.maps.LatLng(lat,long);
-
+    return new google.maps.LatLng(temp.lat, temp.lng);
   }
 
   loadMarkers() {
@@ -73,7 +72,7 @@ export class HomePage {
       var heatmap = new google.maps.visualization.HeatmapLayer({
         data: shitdick
       });
-
+      console.log({"lat": shitdick[0].lat(), "long": shitdick[0].lng()});
       heatmap.setMap(this.map);
 
 
