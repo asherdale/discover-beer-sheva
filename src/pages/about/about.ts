@@ -9,7 +9,7 @@ import { GoogleAnalytics } from '@ionic-native/google-analytics';
  * Ionic pages and navigation.
  */
 
-@IonicPage()
+// @IonicPage()
 @Component({
   selector: 'page-about',
   templateUrl: 'about.html',

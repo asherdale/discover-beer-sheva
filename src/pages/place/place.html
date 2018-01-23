@@ -6,19 +6,56 @@
 -->
 <ion-header>
 
-  <ion-navbar>
-    <ion-title>place</ion-title>
+  <ion-navbar id="navbar">
+    <ion-title></ion-title>
   </ion-navbar>
 
 </ion-header>
 
 
-<ion-content padding>
+<ion-content>
 
-  <h3>{{title}}</h3>
+  <img height="200" src="http://australiabusinessnews.com.au/wp-content/uploads/2016/05/iStock_000064948151_Medium-1170x777.jpg"/>
 
-  <p>
-    One day, there will be more shit here. One day.
-  </p>
+  <!-- <ion-fab top left>
+    <button ion-fab id="close-button" (click)="closePlace()" color="light"><ion-icon name="close-circle"></ion-icon></button>
+  </ion-fab> -->
+
+  <div padding id="content" dir="rtl">
+    <div id="header">
+      <h2>{{place.properties.name}}</h2>
+
+      <h5 id="main-cat">{{place.cat}}</h5>
+    </div>
+
+    <div class="thin-sep-line"></div>
+
+    <div id="timing">
+      <h5 id="isOpen"></h5>
+      <h5 id="hours" dir="ltr">10:00 - 21:30</h5>
+      <ion-icon name="arrow-down"></ion-icon>
+    </div>
+
+    <div class="thin-sep-line"></div>
+
+    <div id="loc-info" >
+      <div id="right-side">
+        <h5>{{place.properties.street}} {{place.properties.house_numb}}</h5>
+      </div>
+
+      <div id="left-side" style="float: left;">
+        <h5 id="distance"></h5>
+        <ion-icon name="walk"></ion-icon>
+      </div>
+    </div>
+
+    <div class="thick-sep-line"></div>
+
+    <div class="contactPoint" *ngFor="let point of contactPoints">
+      <ion-icon name={{point[1]}}></ion-icon>
+      <p>{{point[0]}}</p>
+      <div class="thin-sep-line"></div>
+    </div>
+  </div>
 
 </ion-content>

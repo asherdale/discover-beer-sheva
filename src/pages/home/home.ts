@@ -1,10 +1,10 @@
-// import { identifierModuleUrl } from '@angular/compiler/compiler';
-// import { Observable } from 'rxjs/Observable';
-// import { Storage } from '@ionic/storage';
+// ionic cordova build ios --prod
 import { Component, NgZone, ViewChild, ElementRef } from '@angular/core';
 import { ActionSheetController, AlertController, App, LoadingController, NavController, Platform, ToastController, Events } from 'ionic-angular';
 import { Geolocation } from '@ionic-native/geolocation';
 import { GoogleAnalytics } from '@ionic-native/google-analytics';
+import { Http } from '@angular/http';
+import 'rxjs/add/operator/map';
 
 import { PopoverController } from 'ionic-angular';
 import { PopoverPage } from './popover';
@@ -44,7 +44,8 @@ export class HomePage {
     public geolocation: Geolocation,
     public popoverCtrl: PopoverController,
     public events: Events,
-    public ga: GoogleAnalytics
+    public ga: GoogleAnalytics,
+    public http: Http
   ) {
     this.ga.startTrackerWithId('UA-112680953-1')
       .then(() => {
@@ -54,39 +55,6 @@ export class HomePage {
       .catch(e => console.log('Error starting GoogleAnalytics', e));
 
     this.platform.ready().then(() => this.loadMaps());
-    this.places = [
-      {
-        "title": "Performance Rock Beersheba",
-        "latitude": 31.238039,
-        "longitude": 34.793046,
-        "type": "fitness",
-      }, {
-        "title": "Beit HaBaguette",
-        "latitude": 31.238168,
-        "longitude": 34.792666,
-        "type": "bakeries",
-      }, {
-        "title": "Carraso Science Park",
-        "latitude": 31.241974,
-        "longitude": 34.785521,
-        "type": "museums",
-      }, {
-        "title": "Green Falafel",
-        "latitude": 31.238688,
-        "longitude": 34.790921,
-        "type": "restaurants",
-      }, {
-        "title": "Boost Store",
-        "latitude": 31.240898,
-        "longitude": 34.793339,
-        "type": "stores",
-      }, {
-        "title": "Arabica",
-        "latitude": 31.238726,
-        "longitude": 34.787558,
-        "type": "restaurants",
-      }
-    ];
 
     events.subscribe('filter:changed', (newFilter) => {
       this.setDisplay(document.getElementById('arrow-button'), 'none', document.getElementById('menu-button'), 'block');
@@ -98,22 +66,24 @@ export class HomePage {
     });
   }
 
+
   loadMaps() {
     var isOnline = window.navigator.onLine;
     if (isOnline && !!google) {
-      this.initializeMap();
-      // this.initAutocomplete();
+      this.http.get('assets/data/sampleBusinesses.json').map(res => res.json()).subscribe(data => {
+        this.http.get('assets/data/categories.json').map(res2 => res2.json()).subscribe(cats => {
+          this.initializeMap(data.features, cats);
+        });
+      });
     } else {
       this.errorAlert('Error', 'Something went wrong with the Internet Connection. Please check your Internet.')
     }
   }
 
-  initializeMap() {
+  initializeMap(jsonData, cats) {
     this.zone.run(() => {
       var mapEle = this.mapElement.nativeElement;
       this.map = new google.maps.Map(mapEle, {
-        // zoom: 10,
-        // center: { lat: 34.793139, lng: 31.251530 },
         mapTypeId: google.maps.MapTypeId.ROADMAP,
         styles: [
           {
@@ -161,13 +131,23 @@ export class HomePage {
         }
       });
 
-      const markers = this.places.map((place) => this.addMarkerWithWindow(place, this.map));
+      this.places = jsonData;
+      this.places.forEach((place) => {
+        place.cat = cats[place.properties.type];
+        place.marker = this.getMarker(place, this.map);
+        place.infowindow = this.getInfoWindow(place);
+
+        place.marker.addListener('click', () => {
+          this.openInfoWindow(place);
+        });
+      });
+      const markers = this.places.map(place => place.marker);
+      this.getUserLocation();
 
       google.maps.event.addListenerOnce(this.map, 'idle', () => {
         google.maps.event.trigger(this.map, 'resize');
         mapEle.classList.add('show-map');
         this.bounceMap(markers);
-        // this.getCurrentPositionfromStorage(markers)
       });
 
       google.maps.event.addListener(this.map, 'bounds_changed', () => {
@@ -199,12 +179,11 @@ export class HomePage {
   }
 
   ionViewDidLoad() {
-
     const menuButton = document.getElementById('menu-button');
     const arrowButton = document.getElementById('arrow-button');
     const optionsButton = document.getElementById('options-button');
     const clearButton = document.getElementById('clear-button');
-    const searchInput = document.getElementById('search-input');
+    const searchInput = (<HTMLInputElement>document.getElementById('search-input'));
     document.getElementById('search-form').onsubmit = () => {
       this.mapSearch(searchInput.value);
     }
@@ -217,22 +196,13 @@ export class HomePage {
       }
     }
 
-    // searchInput.onfocusout = () => {
-    //   console.log('search focusout');
-    //   // menuButton.style.display = 'block';
-    //   // arrowButton.style.display = 'none';
-    //   this.setDisplay(arrowButton, 'none', menuButton, 'block');
-    //   // optionsButton.style.display = 'block';
-    //   // clearButton.style.display = 'none';
-    //   this.setDisplay(clearButton, 'none', optionsButton, 'block');
-    // }
-
     arrowButton.onclick = () => {
       searchInput.blur();
       searchInput.value = '';
       this.setDisplay(arrowButton, 'none', menuButton, 'block');
       this.setDisplay(clearButton, 'none', optionsButton, 'block');
     }
+
     clearButton.onclick = () => {
       searchInput.value = '';
       searchInput.focus();
@@ -273,38 +243,29 @@ export class HomePage {
     }, 200);
   }
 
-  addMarkerWithWindow(place, map) {
-    place.marker = new google.maps.Marker({
+  getMarker(place, map) {
+    return new google.maps.Marker({
       position: {
-        lat: place.latitude,
-        lng: place.longitude
+        lat: place.geometry.coordinates[1],
+        lng: place.geometry.coordinates[0]
       },
       map: map,
-      title: place.title,
+      title: place.properties.name,
       animation: google.maps.Animation.DROP,
     });
-    this.addInfoWindow(place);
-    return place.marker;
   }
 
-  addInfoWindow(place) {
+
+  getInfoWindow(place) {
     let contentString = '<div id="info-window-content">'+
-        `<h6 id="title">${place.title}</h6>`+
-        `<p id="title">${place.type}</p>`+
+        `<h6 id="title">${place.properties.name}</h6>`+
+        `<p id="title">${place.cat}</p>`+
         '<button id="toPlacePage">More</button>' +
         '</div>';
-    place.infowindow = new google.maps.InfoWindow({
+    return new google.maps.InfoWindow({
       content: contentString
     });
-
-    place.marker.addListener('click', () => {
-      this.openInfoWindow(place);
-    });
   }
-
-  // typeToSingular(type) {
-  //   return (!type.endsWith('s') || type.endsWith('ss')) ? type : type.slice(0, -1);
-  // }
 
   openInfoWindow(place) {
     this.closeInfoWindow();
@@ -323,7 +284,7 @@ export class HomePage {
   }
 
   toPlacePage() {
-    this.nav.push(PlacePage, this.selectedPlace);
+    this.nav.push(PlacePage, { place: this.selectedPlace, userLocation: this.userLocation });
   }
 
   mapSearch(query) {
@@ -341,10 +302,10 @@ export class HomePage {
       }
     });
 
-    
+
     if (results.length == 1) {
       this.openInfoWindow(results[0]);
-      this.map.setCenter({lat: results[0].latitude, lng: results[0].longitude}); 
+      this.map.setCenter({lat: results[0].latitude, lng: results[0].longitude});
       this.map.setZoom(16);
     } else if (results.length > 0) {
       this.bounceMap(this.getAttributeFromPlaces(results, 'marker'));
@@ -408,10 +369,10 @@ export class HomePage {
     });
 
     const displayName = this.selectedFilter.charAt(0).toUpperCase() + this.selectedFilter.slice(1);
-    document.getElementById('search-input').value = this.selectedFilter === "all" ? '' : displayName;
+    (<HTMLInputElement>document.getElementById('search-input')).value = this.selectedFilter === "all" ? '' : displayName;
 
     if (results.length == 1) {
-      this.map.setCenter({lat: results[0].latitude, lng: results[0].longitude}); 
+      this.map.setCenter({lat: results[0].latitude, lng: results[0].longitude});
       this.map.setZoom(16);
     } else if (results.length > 0) {
       this.bounceMap(this.getAttributeFromPlaces(results, 'marker'));
@@ -423,11 +384,13 @@ export class HomePage {
 
   locate() {
     if (this.userLocation && this.userLocation.position) {
-      this.map.setCenter(this.userLocation.position); 
+      this.map.setCenter(this.userLocation.position);
       this.map.setZoom(16);
     } else {
       this.getUserLocation();
     }
+    // TODO: delete following
+    this.bounceMap(this.places.map(place => place.marker));
   }
 
   // go show currrent location
@@ -453,11 +416,6 @@ export class HomePage {
               icon: '../../assets/img/blue-dot.png',
             });
             thisPage.locate();
-            const watchPositionOptions = {
-              enableHighAccuracy: false,
-              timeout: 5000,
-              maximumAge: 0,
-            };
           });
         },
         (error) => {
@@ -471,61 +429,4 @@ export class HomePage {
       console.log('Device/browser doesn\'t support Geolocation');
     }
   }
-
-    // mapsSearchBar(ev: any) {
-  //   // set input to the value of the searchbar
-  //   //this.search = ev.target.value;
-  //   console.log(ev);
-  //   const autocomplete = new google.maps.places.Autocomplete(ev);
-  //   autocomplete.bindTo('bounds', this.map);
-  //   return new Observable((sub: any) => {
-  //     google.maps.event.addListener(autocomplete, 'place_changed', () => {
-  //       const place = autocomplete.getPlace();
-  //       if (!place.geometry) {
-  //         sub.error({
-  //           message: 'Autocomplete returned place with no geometry'
-  //         });
-  //       } else {
-  //         sub.next(place.geometry.location);
-  //         sub.complete();
-  //       }
-  //     });
-  //   });
-  // }
-
-  // initAutocomplete(): void {
-  //   // reference : https://github.com/driftyco/ionic/issues/7223
-  //   this.addressElement = this.searchbar.nativeElement.querySelector('.searchbar-input');
-  //   this.createAutocomplete(this.addressElement).subscribe((location) => {
-  //     console.log('Searchdata', location);
-
-  //     let options = {
-  //       center: location,
-  //       zoom: 10
-  //     };
-  //     this.map.setOptions(options);
-  //     this.addMarker(location, "Mein gesuchter Standort");
-
-  //   });
-  // }
-
-  // createAutocomplete(addressEl: HTMLInputElement): Observable<any> {
-  //   const autocomplete = new google.maps.places.Autocomplete(addressEl);
-  //   autocomplete.bindTo('bounds', this.map);
-  //   return new Observable((sub: any) => {
-  //     google.maps.event.addListener(autocomplete, 'place_changed', () => {
-  //       const place = autocomplete.getPlace();
-  //       if (!place.geometry) {
-  //         sub.error({
-  //           message: 'Autocomplete returned place with no geometry'
-  //         });
-  //       } else {
-  //         console.log('Search Lat', place.geometry.location.lat());
-  //         console.log('Search Lng', place.geometry.location.lng());
-  //         sub.next(place.geometry.location);
-  //         //sub.complete();
-  //       }
-  //     });
-  //   });
-  // }
 }
