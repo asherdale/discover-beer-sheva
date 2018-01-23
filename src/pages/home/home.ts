@@ -71,11 +71,7 @@ export class HomePage {
       var heatmap = new google.maps.visualization.HeatmapLayer({
         data: data
       });
-<<<<<<< HEAD
       console.log({"lat": data[0].lat(), "long": data[0].lng()});
-=======
-      console.log({"lat": data[0].lat(), "long": shitdick[0].lng()});
->>>>>>> 0cf6a224b27cc0cfea30ba7e78faeb5d6cc3f813
       heatmap.setMap(this.map);
     });
 
