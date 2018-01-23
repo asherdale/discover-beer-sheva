@@ -7,6 +7,7 @@ import { MyApp } from './app.component';
 import { HomePage } from '../pages/home/home';
 import { PlacePage } from '../pages/place/place';
 import { AboutPage } from '../pages/about/about';
+import { ContactUsPage} from '../pages/contact-us/contact-us';
 import { PopoverPage } from '../pages/home/popover';
 import { IonicStorageModule } from '@ionic/storage';
 
@@ -21,7 +22,9 @@ import { GoogleAnalytics } from '@ionic-native/google-analytics';
     HomePage,
     PlacePage,
     AboutPage,
+    ContactUsPage,
     PopoverPage
+
   ],
   imports: [
     BrowserModule,
@@ -35,6 +38,7 @@ import { GoogleAnalytics } from '@ionic-native/google-analytics';
     HomePage,
     PlacePage,
     AboutPage,
+    ContactUsPage,
     PopoverPage
   ],
   providers: [

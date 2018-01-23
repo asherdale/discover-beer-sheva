@@ -7,6 +7,7 @@ import { StatusBar } from '@ionic-native/status-bar';
 
 import { HomePage } from '../pages/home/home';
 import { AboutPage } from '../pages/about/about';
+import { ContactUsPage} from '../pages/contact-us/contact-us';
 
 
 @Component({
@@ -28,6 +29,7 @@ export class MyApp {
       this.pages = [
         { title: 'Map', component: HomePage },
         { title: 'About', component: AboutPage },
+        { title: 'Contact Us', component: ContactUsPage},
       ];
     });
   }
