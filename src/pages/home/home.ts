@@ -2,6 +2,7 @@ import { Component, NgZone, ViewChild, ElementRef } from '@angular/core';
 import { ActionSheetController, AlertController, App, LoadingController, NavController, Platform, ToastController } from 'ionic-angular';
 import { Geolocation } from '@ionic-native/geolocation';
 import { Http } from '@angular/http';
+
 var utmObj = require('utm-latlng');
 
 declare var google: any;
@@ -40,14 +41,16 @@ export class HomePage {
   }
 
   getCoordinates(x) {
-    const utm = new utmObj('International');
-    //https://en.wikipedia.org/wiki/File:LA2-Africa-UTM-zones.png
-    let temp = utm.convertUtmToLatLng(x.geometry.coordinates[0], x.geometry.coordinates[1], 36, "R");
+    const utm = new utmObj();
+    let temp = utm.convertLatLngToUtm(31.252973, 34.791462000000024);
+    var utmData = { "ZoneNumber" : temp.ZoneNumber, "ZoneLetter" : temp.ZoneLetter};
 
+    let temp = utm.convertUtmToLatLng(x.geometry.coordinates[0], x.geometry.coordinates[1], utmData.ZoneNumber, utmData.ZoneLetter);
     return new google.maps.LatLng(temp.lat, temp.lng);
   }
 
   loadMarkers() {
+
     // http://opendata.br7.org.il/datasets/geojson/street_light.geojson
     // http://opendata.br7.org.il/datasets/geojson/cameras.geojson
     let load = (name: string): Promise<{}> => {
@@ -58,7 +61,6 @@ export class HomePage {
         });
       });
     };
-
 
     load("street_light").then(heatmapData => {
       this.showToast("Loaded street lights");
@@ -74,8 +76,6 @@ export class HomePage {
       });
       console.log({"lat": shitdick[0].lat(), "long": shitdick[0].lng()});
       heatmap.setMap(this.map);
-
-
     });
 
     /*load("cameras").then(d => {
