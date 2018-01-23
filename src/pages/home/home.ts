@@ -3,6 +3,8 @@ import { ActionSheetController, AlertController, App, LoadingController, NavCont
 import { Geolocation } from '@ionic-native/geolocation';
 import { Http } from '@angular/http';
 
+var utmObj = require('utm-latlng');
+
 declare var google: any;
 
 @Component({
@@ -30,7 +32,7 @@ export class HomePage {
     // public storage: Storage,
     public actionSheetCtrl: ActionSheetController,
     public geolocation: Geolocation,
-    public http: Http
+    public http: Http,
   ) {
     this.platform.ready().then(() => {
       this.loadMaps();
@@ -38,10 +40,20 @@ export class HomePage {
     });
   }
 
-  loadMarkers(){
+  getCoordinates(x) {
+    const utm = new utmObj();
+    let temp = utm.convertLatLngToUtm(31.252973, 34.791462000000024);
+    var utmData = { "ZoneNumber" : temp.ZoneNumber, "ZoneLetter" : temp.ZoneLetter};
+
+    let temp = utm.convertUtmToLatLng(x.geometry.coordinates[0], x.geometry.coordinates[1], utmData.ZoneNumber, utmData.ZoneLetter);
+    return new google.maps.LatLng(temp.lat, temp.lng);
+  }
+
+  loadMarkers() {
+
     // http://opendata.br7.org.il/datasets/geojson/street_light.geojson
     // http://opendata.br7.org.il/datasets/geojson/cameras.geojson
-    let load = (name: string) : Promise<{}> => {
+    let load = (name: string): Promise<{}> => {
       return new Promise<{}>(resolve => {
         this.http.get(`http://opendata.br7.org.il/datasets/geojson/${name}.geojson`).subscribe(data => {
           let r = JSON.parse(data["_body"])["features"];
@@ -50,12 +62,23 @@ export class HomePage {
       });
     };
 
-    load("street_light").then(d => {
+    load("street_light").then(heatmapData => {
       this.showToast("Loaded street lights");
-      // Insert code to put markers on map here
+
+      var shitdick = [];
+
+      for (var key in heatmapData){
+        shitdick.push(this.getCoordinates(heatmapData[key]));
+      }
+
+      var heatmap = new google.maps.visualization.HeatmapLayer({
+        data: shitdick
+      });
+      console.log({"lat": shitdick[0].lat(), "long": shitdick[0].lng()});
+      heatmap.setMap(this.map);
     });
 
-    load("cameras").then(d => {
+    /*load("cameras").then(d => {
       this.showToast("Loaded security cameras");
       for (var i = 0; i < d.length; i++){
         let item = d[i];
@@ -70,6 +93,7 @@ export class HomePage {
           }
         });
       }
+    })
     })
   }
 
@@ -143,30 +167,30 @@ export class HomePage {
         });
       });
 
-      try{
+      try {
         let watch = this.geolocation.watchPosition();
         watch.subscribe(data => this.moveTo(data));
         this.geolocation.getCurrentPosition().then(data => this.moveTo(data));
       }
-      catch (e){
+      catch (e) {
         this.showToast("Unable to pan to location");
         console.error(e);
       }
 
       this.MYLOC = new google.maps.Marker({
-          clickable: false,
-          icon: new google.maps.MarkerImage('//maps.gstatic.com/mapfiles/mobile/mobileimgs2.png',
-              new google.maps.Size(22, 22),
-              new google.maps.Point(0, 18),
-              new google.maps.Point(11, 11)),
-          shadow: null,
-          zIndex: 999,
-          map: this.map// your google.maps.Map object
+        clickable: false,
+        icon: new google.maps.MarkerImage('//maps.gstatic.com/mapfiles/mobile/mobileimgs2.png',
+          new google.maps.Size(22, 22),
+          new google.maps.Point(0, 18),
+          new google.maps.Point(11, 11)),
+        shadow: null,
+        zIndex: 999,
+        map: this.map// your google.maps.Map object
       });
     });
   }
 
-  moveTo(data){
+  moveTo(data) {
     //console.log(data);
     let lg = new google.maps.LatLng(data.coords.latitude, data.coords.longitude);
     this.map.setZoom(20);
@@ -183,10 +207,10 @@ export class HomePage {
   }
 
 
-  placeMarker(options){
+placeMarker(options){
     var marker = new google.maps.Marker({
       map: this.map,
-      position: {lat: options.lat || 0, lng: options.long || 0},
+      position: { lat: options.lat || 0, lng: options.long || 0 },
       title: options.title || "",
       icon: {
         url: options.url,
