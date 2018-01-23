@@ -64,17 +64,14 @@ export class HomePage {
 
     load("street_light").then(heatmapData => {
       this.showToast("Loaded street lights");
-
-      var shitdick = [];
-
+      var data = [];
       for (var key in heatmapData){
-        shitdick.push(this.getCoordinates(heatmapData[key]));
+        data.push(this.getCoordinates(heatmapData[key]));
       }
-
       var heatmap = new google.maps.visualization.HeatmapLayer({
-        data: shitdick
+        data: data
       });
-      console.log({"lat": shitdick[0].lat(), "long": shitdick[0].lng()});
+      console.log({"lat": data[0].lat(), "long": shitdick[0].lng()});
       heatmap.setMap(this.map);
     });
 
