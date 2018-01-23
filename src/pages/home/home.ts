@@ -78,7 +78,7 @@ export class HomePage {
       heatmap.setMap(this.map);
     });
 
-    /*load("cameras").then(d => {
+    load("cameras").then(d => {
       this.showToast("Loaded security cameras");
       for (var i = 0; i < d.length; i++){
         let item = d[i];
@@ -93,8 +93,7 @@ export class HomePage {
           }
         });
       }
-    })
-    })
+    });
   }
 
   loadMaps() {
