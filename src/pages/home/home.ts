@@ -51,8 +51,8 @@ export class HomePage {
 
     // http://opendata.br7.org.il/datasets/geojson/street_light.geojson
     // http://opendata.br7.org.il/datasets/geojson/cameras.geojson
-    let load = (name: string): Promise<{}> => {
-      return new Promise<{}>(resolve => {
+    let load = (name: string): Promise<[]> => {
+      return new Promise<[]>(resolve => {
         this.http.get(`http://opendata.br7.org.il/datasets/geojson/${name}.geojson`).subscribe(data => {
           let r = JSON.parse(data["_body"])["features"];
           resolve(r);
@@ -76,7 +76,7 @@ export class HomePage {
     load("cameras").then(d => {
       this.showToast("Loaded security cameras");
       console.log(d);
-      for (var i = 0; i < d.length; i++){
+      for (var i = 0; i < d["length"]; i++){
         let item = d[i];
         this.placeMarker({
           "lat": item.properties.Y,
