@@ -55,6 +55,7 @@ export class HomePage {
       return new Promise<[]>(resolve => {
         this.http.get(`http://opendata.br7.org.il/datasets/geojson/${name}.geojson`).subscribe(data => {
           let r = JSON.parse(data["_body"])["features"];
+          if (!Array.isArray(r)){ throw "Data downloaded is not array"; }
           resolve(r);
         });
       });
