@@ -9,8 +9,7 @@ import { HomePage } from '../pages/home/home';
 import { AboutPage } from '../pages/about/about';
 import { AlertPage } from '../pages/alert/alert';
 import { SettingsPage } from '../pages/settings/settings';
-
-
+import { ContactUsPage } from '../pages/contact-us/contact-us';
 
 @Component({
   templateUrl: 'app.html'
@@ -32,10 +31,10 @@ export class MyApp {
     this.pages = [
       { title: '', component: null },
       { title: 'Home', component: HomePage },
-      { title: 'About', component: AboutPage },
       { title: 'Alert', component: AlertPage },
-      { title: 'Settings', component: SettingsPage },
-
+      { title: 'About', component: AboutPage },
+      { title: 'Contact Us', component: ContactUsPage},
+      { title: 'Settings', component: SettingsPage }
     ];
   }
 
