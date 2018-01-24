@@ -29,6 +29,7 @@
     "@types/node": "^9.3.0",
     "cordova-android": "7.0.0",
     "cordova-ios": "4.5.4",
+    "cordova-plugin-advanced-http": "^1.9.1",
     "cordova-plugin-device": "^1.1.7",
     "cordova-plugin-geolocation": "^4.0.1",
     "cordova-plugin-ionic-webview": "^1.1.16",
@@ -73,7 +74,8 @@
       "cordova-plugin-ionic-webview": {},
       "cordova-plugin-geolocation": {
         "GEOLOCATION_USAGE_DESCRIPTION": "To locate you"
-      }
+      },
+      "cordova-plugin-advanced-http": {}
     },
     "platforms": [
       "ios",
