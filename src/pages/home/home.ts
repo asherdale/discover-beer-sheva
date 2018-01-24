@@ -42,16 +42,9 @@ export class HomePage {
 
   getCoordinates(x) {
     const utm = new utmObj();
-    /*let temp = utm.convertLatLngToUtm(31.252973, 34.791462000000024);
-    var utmData = { "ZoneNumber" : temp.ZoneNumber, "ZoneLetter" : temp.ZoneLetter};*/
 
-<<<<<<< HEAD
     let temp = utm.convertUtmToLatLng(x.geometry.coordinates[0], x.geometry.coordinates[1], 36, 'R');
     return new google.maps.LatLng(temp.lat, temp.lng);
-=======
-    let temp1 = utm.convertUtmToLatLng(x.geometry.coordinates[0], x.geometry.coordinates[1], utmData.ZoneNumber, utmData.ZoneLetter);
-    return new google.maps.LatLng(temp1.lat, temp1.lng);
->>>>>>> cf317c4626f51ce591d0c716a6222221d4dfaf4c
   }
 
   loadMarkers() {
