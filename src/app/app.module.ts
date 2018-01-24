@@ -1,6 +1,7 @@
 import { NgModule, ErrorHandler } from '@angular/core';
 import { IonicApp, IonicModule, IonicErrorHandler } from 'ionic-angular';
 import { BrowserModule } from '@angular/platform-browser';
+import { HTTP } from '@ionic-native/http';
 
 
 import { MyApp } from './app.component';
@@ -46,6 +47,7 @@ import { HttpModule } from '@angular/http';
     StatusBar,
     SplashScreen,
     Geolocation,
+    HTTP,
     {provide: ErrorHandler, useClass: IonicErrorHandler}
   ]
 })
