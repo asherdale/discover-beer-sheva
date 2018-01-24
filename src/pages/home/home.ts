@@ -2,7 +2,7 @@ import { Component, NgZone, ViewChild, ElementRef } from '@angular/core';
 import { ActionSheetController, AlertController, App, LoadingController, NavController, Platform, ToastController } from 'ionic-angular';
 import { Geolocation } from '@ionic-native/geolocation';
 import { Http } from '@angular/http';
-
+//import { utmObj } from 'utm-latlng'
 var utmObj = require('utm-latlng');
 
 declare var google: any;
@@ -80,8 +80,8 @@ export class HomePage {
       for (var i = 0; i < d.length; i++){
         let item = d[i];
         this.placeMarker({
-          "lat": item.properties.X,
-          "long": item.properties.Y,
+          "lat": item.properties.Y,
+          "long": item.properties.X,
           "title": "Camera",
           "url": "https://mt.googleapis.com/vt/icon/name=icons/onion/1493-wht-blank_maps-4x.png&filter=ff795046",
           "size": {
