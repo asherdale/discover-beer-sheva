@@ -45,8 +45,8 @@ export class HomePage {
     let temp = utm.convertLatLngToUtm(31.252973, 34.791462000000024);
     var utmData = { "ZoneNumber" : temp.ZoneNumber, "ZoneLetter" : temp.ZoneLetter};
 
-    let temp = utm.convertUtmToLatLng(x.geometry.coordinates[0], x.geometry.coordinates[1], utmData.ZoneNumber, utmData.ZoneLetter);
-    return new google.maps.LatLng(temp.lat, temp.lng);
+    let temp1 = utm.convertUtmToLatLng(x.geometry.coordinates[0], x.geometry.coordinates[1], utmData.ZoneNumber, utmData.ZoneLetter);
+    return new google.maps.LatLng(temp1.lat, temp1.lng);
   }
 
   loadMarkers() {
