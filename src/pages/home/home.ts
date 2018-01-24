@@ -186,8 +186,17 @@ export class HomePage {
     });
   }
 
+  lastPos : any;
+
   moveTo(data) {
     //console.log(data);
+    if (this.lastPos == data){
+      return;
+    }
+    else{
+      this.lastPos = data;
+    }
+
     let lg = new google.maps.LatLng(data.coords.latitude, data.coords.longitude);
     this.map.setZoom(20);
     this.map.setCenter(lg);
