@@ -2,8 +2,8 @@ import { Component, NgZone, ViewChild, ElementRef } from '@angular/core';
 import { ActionSheetController, AlertController, App, LoadingController, NavController, Platform, ToastController } from 'ionic-angular';
 import { Geolocation } from '@ionic-native/geolocation';
 import { Http } from '@angular/http';
-//import { utmObj } from 'utm-latlng'
-var utmObj = require('utm-latlng');
+import * as utmObj from 'utm-latlng';
+//var utmObj = require('utm-latlng');
 
 declare var google: any;
 
@@ -42,10 +42,10 @@ export class HomePage {
 
   getCoordinates(x) {
     const utm = new utmObj();
-    let temp = utm.convertLatLngToUtm(31.252973, 34.791462000000024);
-    var utmData = { "ZoneNumber" : temp.ZoneNumber, "ZoneLetter" : temp.ZoneLetter};
+    /*let temp = utm.convertLatLngToUtm(31.252973, 34.791462000000024);
+    var utmData = { "ZoneNumber" : temp.ZoneNumber, "ZoneLetter" : temp.ZoneLetter};*/
 
-    let temp = utm.convertUtmToLatLng(x.geometry.coordinates[0], x.geometry.coordinates[1], utmData.ZoneNumber, utmData.ZoneLetter);
+    let temp = utm.convertUtmToLatLng(x.geometry.coordinates[0], x.geometry.coordinates[1], 36, 'R');
     return new google.maps.LatLng(temp.lat, temp.lng);
   }
 
