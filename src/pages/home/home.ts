@@ -83,7 +83,7 @@ export class HomePage {
           "lat": item.properties.Y,
           "long": item.properties.X,
           "title": "Camera",
-          "url": "https://mt.googleapis.com/vt/icon/name=icons/onion/1493-wht-blank_maps-4x.png&filter=ff795046",
+          "url": "../../assets/icon/camera-32.png",
           "size": {
             "x": 32,
             "y": 32
