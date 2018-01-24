@@ -199,7 +199,7 @@ export class HomePage {
 
     let lg = new google.maps.LatLng(data.coords.latitude, data.coords.longitude);
     this.map.setZoom(20);
-    this.map.setCenter(lg);
+    this.map.panTo(lg);
     this.MYLOC.setPosition(lg);
     console.log({
       "zoom": this.map.getZoom(),
