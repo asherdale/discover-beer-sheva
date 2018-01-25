@@ -55,6 +55,13 @@ page-home {
       z-index: 1000;
     }
 
+    #alertButton{
+      z-index: 1001;
+    }
+
+    .invisible{
+      display: none;
+    }
 
     ion-fab button[ion-fab][menuToggle] {
        background-color: transparent;

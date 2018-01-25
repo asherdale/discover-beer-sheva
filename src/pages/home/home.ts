@@ -281,4 +281,9 @@ placeMarker(options){
     toast.present();
   }
 
+  alertOpen(event){
+    console.log("Alert open");
+    let element = event.target;
+    
+  }
 }
