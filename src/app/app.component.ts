@@ -17,7 +17,7 @@ import { ContactUsPage } from '../pages/contact-us/contact-us';
 export class MyApp {
   @ViewChild(Nav) nav: Nav;
 
-  rootPage = ContactUsPage;
+  rootPage = AlertPage;
   pages: Array<{title: string, component: any}>;
 
   constructor(platform: Platform, public SplashScreen: SplashScreen, public StatusBar: StatusBar, public menu: MenuController) {

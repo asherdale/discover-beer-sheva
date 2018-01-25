@@ -1,3 +1,16 @@
 page-alert {
+  #alertButton{
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+  }
 
+  .full{
+    height: 90%;
+
+    *{
+      height:100%;
+    }
+  }
 }
