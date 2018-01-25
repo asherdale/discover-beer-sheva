@@ -87,12 +87,12 @@ page-home {
         height: 2em;
         font-size: 1rem;
         color: #fff;
-        background-color: #488aff;
+        background-color: color($colors, primary, base);
         padding: 0 1em;
     }
     #locate-button {
         ion-icon {
-            color: #488aff;
+            color: color($colors, primary, base);
         }
         margin-bottom: 30%;
         margin-right: 20%;
