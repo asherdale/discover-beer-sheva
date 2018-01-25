@@ -18,6 +18,6 @@
 
 <ion-content padding>
   <ion-item class="full">
-    <button #alertButton ion-button full large>Press me!</button>
+      <button #alertButton ion-button full large (touchstart)="start($event)" (touchend)="end($event)">Press me!</button>
   </ion-item>
 </ion-content>
