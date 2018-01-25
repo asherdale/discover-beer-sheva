@@ -3,9 +3,8 @@ textarea{resize:none}
 
   #commentField{
     border: 1px solid gray;
-    display: table-cell;
-    margin-left: auto;
-    margin-right: auto;
+    display: inline-block;
+    width: 100%;
   }
 
 }
