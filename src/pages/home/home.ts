@@ -13,6 +13,8 @@ declare var google: any;
 })
 export class HomePage {
   @ViewChild('map') mapElement: ElementRef;
+  @ViewChild('alertButton') alertButton : ElementRef;
+  @ViewChild('openButton') openButton : ElementRef;
   addressElement: HTMLInputElement = null;
 
   map: any;
@@ -281,9 +283,9 @@ placeMarker(options){
     toast.present();
   }
 
-  alertOpen(event){
+  alertOpen(){
     console.log("Alert open");
-    let element = event.target;
-    
+    alertButton.classList.toggle("invisible");
+    openButton.classList.toggle("invisible");
   }
 }
