@@ -25,11 +25,17 @@ export class AlertPage {
   start(event){
     this.showToast("Start");
     event.target.classList.toggle("pressDown", true);
+    event.target.innerText = "Armed";
+
+    console.log(event.target.className);
   }
 
   end(event){
     this.showToast("End");
     event.target.classList.toggle("pressDown", false);
+    event.target.innerText = "Idle";
+
+    console.log(event.target.className);
   }
 
   showToast(message) {
