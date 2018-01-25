@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, ElementRef } from '@angular/core';
 import { IonicPage, NavController, NavParams } from 'ionic-angular';
 
 /**
@@ -26,7 +26,7 @@ export class ContactUsPage {
   }
 
   submit(){
-    
+
   }
 
 }
