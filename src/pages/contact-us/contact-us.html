@@ -8,7 +8,7 @@
 
   <ion-navbar>
     <button ion-button menuToggle>
-		<ion-icon name="menu"></ion-icon>
+		<ion-icon name="menu"></ion-icon>1
 	</button>
     <ion-title>Contact Us</ion-title>
   </ion-navbar>
@@ -24,5 +24,5 @@
       <ion-label id=commentLabel color="primary" floating >Comment</ion-label>
     </ion-item>
   </ion-list>
-  <textarea id="commentField" id="commentField" rows="10" cols="40" ></textarea>
-  <button ion-button full>Submit</button>
+  <textarea #commentField rows="10" cols="40" ></textarea>
+  <button ion-button full item-content (click)="submit();">Submit</button>

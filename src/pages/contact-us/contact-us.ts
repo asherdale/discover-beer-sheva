@@ -9,23 +9,24 @@ import { IonicPage, NavController, NavParams } from 'ionic-angular';
  */
 
 @IonicPage()
-@ViewChild('commentField') commentField : ElementRef;
 @Component({
   selector: 'page-contact-us',
   templateUrl: 'contact-us.html',
 })
 export class ContactUsPage {
+//  @ViewChild('commentField');
+  commentField: ElementRef;
 
   constructor(public navCtrl: NavController, public navParams: NavParams) {
+
   }
 
   ionViewDidLoad() {
     console.log('ionViewDidLoad ContactUsPage');
   }
 
-
-  resize() {
-      this.commentField.nativeElement.style.height = this.commentField.nativeElement.scrollHeight + 'px';
+  submit(){
+    
   }
 
 }
