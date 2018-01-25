@@ -283,9 +283,25 @@ placeMarker(options){
     toast.present();
   }
 
-  alertOpen(){
+  alertOpen(event){
     console.log("Alert open");
     alertButton.classList.toggle("invisible");
     openButton.classList.toggle("invisible");
+  }
+
+  alert_start(event){
+    this.showToast("Start");
+    event.target.classList.toggle("pressDown", true);
+    event.target.innerText = "Armed";
+
+    console.log(event.target.className);
+  }
+
+  alert_end(event){
+    this.showToast("End");
+    event.target.classList.toggle("pressDown", false);
+    event.target.innerText = "Idle";
+
+    console.log(event.target.className);
   }
 }

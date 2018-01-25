@@ -14,7 +14,7 @@
   </ion-fab>
 
   <ion-footer>
-    <button #alertButton id="alertButton" ion-button full large bottom class="invisible">Idle</button>
+    <button #alertButton id="alertButton" ion-button full large bottom class="invisible" (touchstart)="alert_start($event)" (touchend)="alert_end($event)">Idle</button>
   </ion-footer>
 
   <div class="map">
