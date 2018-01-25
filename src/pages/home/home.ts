@@ -52,7 +52,7 @@ export class HomePage {
     // http://opendata.br7.org.il/datasets/geojson/street_light.geojson
     // http://opendata.br7.org.il/datasets/geojson/cameras.geojson
     let load = (name: string): Promise<{}[]> => {
-      return new Promise<{}[]>(resolve => {
+      return new Promise<{}>(resolve => {
         this.http.get(`http://opendata.br7.org.il/datasets/geojson/${name}.geojson`).subscribe(data => {
           let r = JSON.parse(data["_body"])["features"];
           if (!Array.isArray(r)){ throw "Data downloaded is not array"; }
@@ -106,7 +106,7 @@ export class HomePage {
       var mapEle = this.mapElement.nativeElement;
       this.map = new google.maps.Map(mapEle, {
         // zoom: 10,
-        // center: { lat: 34.793139, lng: 31.251530 },
+         center: { lat: 34.793139, lng: 31.251530 },
         mapTypeId: google.maps.MapTypeId.ROADMAP,
         styles: [
           {
