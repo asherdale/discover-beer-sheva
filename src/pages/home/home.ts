@@ -51,7 +51,7 @@ export class HomePage {
 
     // http://opendata.br7.org.il/datasets/geojson/street_light.geojson
     // http://opendata.br7.org.il/datasets/geojson/cameras.geojson
-    let load = (name: string): Promise<{}[]> => {
+    let load = (name: string): Promise<{}> => {
       return new Promise<{}>(resolve => {
         this.http.get(`http://opendata.br7.org.il/datasets/geojson/${name}.geojson`).subscribe(data => {
           let r = JSON.parse(data["_body"])["features"];
