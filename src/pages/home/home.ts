@@ -290,7 +290,7 @@ placeMarker(options){
   }
 
   alert_start(event){
-    this.showToast("Start");
+    //this.showToast("Start");
     event.target.classList.toggle("pressDown", true);
     event.target.innerText = "Armed";
 
@@ -298,7 +298,7 @@ placeMarker(options){
   }
 
   alert_end(event){
-    this.showToast("End");
+    //this.showToast("End");
     event.target.classList.toggle("pressDown", false);
     event.target.innerText = "Idle";
 
