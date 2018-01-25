@@ -66,4 +66,19 @@ page-home {
     ion-fab button[ion-fab][menuToggle] {
        background-color: transparent;
     }
+
+    #alertButton{
+      .pressDown{
+        animation-name: armed;
+        animation-duration: 1s;
+        animation-iteration-count: infinite;
+        animation-direction: alternate-reverse;
+      }
+    }
+
+    @keyframes armed {
+      to {
+        background-color: red;
+      }
+    }
 }
