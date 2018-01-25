@@ -24,12 +24,14 @@
     "@ionic-native/core": "4.3.0",
     "@ionic-native/email-composer": "^4.5.2",
     "@ionic-native/geolocation": "4.3.0",
+    "@ionic-native/http": "^4.5.2",
     "@ionic-native/splash-screen": "4.3.0",
     "@ionic-native/status-bar": "4.3.0",
     "@ionic/storage": "2.0.1",
     "@types/node": "^9.3.0",
     "cordova-android": "7.0.0",
     "cordova-ios": "4.5.4",
+    "cordova-plugin-advanced-http": "^1.9.1",
     "cordova-plugin-device": "^1.1.4",
     "cordova-plugin-email-composer": "^0.8.12",
     "cordova-plugin-ionic-webview": "^1.1.16",
@@ -72,7 +74,8 @@
       "cordova-plugin-device": {},
       "cordova-plugin-splashscreen": {},
       "cordova-plugin-ionic-webview": {},
-      "cordova-plugin-email-composer": {}
+      "cordova-plugin-email-composer": {},
+      "cordova-plugin-advanced-http": {}
     },
     "platforms": [
       "ios"
