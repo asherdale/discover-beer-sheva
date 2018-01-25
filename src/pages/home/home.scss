@@ -50,8 +50,13 @@ page-home {
             padding: 0;
         }
     }
-}
 
-ion-fab button[ion-fab] {
-   background-color: transparent;
+    #openButton{
+      z-index: 1000;
+    }
+
+
+    ion-fab button[ion-fab][menuToggle] {
+       background-color: transparent;
+    }
 }
