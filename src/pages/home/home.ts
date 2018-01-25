@@ -42,8 +42,6 @@ export class HomePage {
 
   getCoordinates(x) {
     const utm = new utmObj();
-    /*let temp = utm.convertLatLngToUtm(31.252973, 34.791462000000024);
-    var utmData = { "ZoneNumber" : temp.ZoneNumber, "ZoneLetter" : temp.ZoneLetter};*/
 
     let temp = utm.convertUtmToLatLng(x.geometry.coordinates[0], x.geometry.coordinates[1], 36, 'R');
     return new google.maps.LatLng(temp.lat, temp.lng);
@@ -53,10 +51,18 @@ export class HomePage {
 
     // http://opendata.br7.org.il/datasets/geojson/street_light.geojson
     // http://opendata.br7.org.il/datasets/geojson/cameras.geojson
-    let load = (name: string): Promise<{}> => {
+    let load = (name: string): Promise<{}[]> => {
       return new Promise<{}>(resolve => {
         this.http.get(`http://opendata.br7.org.il/datasets/geojson/${name}.geojson`).subscribe(data => {
           let r = JSON.parse(data["_body"])["features"];
+          if (!Array.isArray(r)){ throw "Data downloaded is not array"; }
+
+          for(let item in r){
+            if (r[0].type !== "Feature"){
+              throw "Validation failed";
+            }
+          }
+
           resolve(r);
         });
       });
@@ -77,7 +83,8 @@ export class HomePage {
 
     load("cameras").then(d => {
       this.showToast("Loaded security cameras");
-      for (var i = 0; i < d.length; i++){
+      console.log(d);
+      for (var i = 0; i < d["length"]; i++){
         let item = d[i];
         this.placeMarker({
           "lat": item.properties.Y,
@@ -106,7 +113,7 @@ export class HomePage {
       var mapEle = this.mapElement.nativeElement;
       this.map = new google.maps.Map(mapEle, {
         // zoom: 10,
-        // center: { lat: 34.793139, lng: 31.251530 },
+         center: { lat: 34.793139, lng: 31.251530 },
         mapTypeId: google.maps.MapTypeId.ROADMAP,
         styles: [
           {
@@ -199,7 +206,7 @@ export class HomePage {
 
     let lg = new google.maps.LatLng(data.coords.latitude, data.coords.longitude);
     this.map.setZoom(20);
-    this.map.setCenter(lg);
+    this.map.panTo(lg);
     this.MYLOC.setPosition(lg);
     console.log({
       "zoom": this.map.getZoom(),
