@@ -32,7 +32,7 @@ page-home {
   ion-searchbar {
     position: absolute;
     opacity: 0.7;
-    z-index: 3;
+    //z-index: 3;
   }
 
   .switch {
@@ -43,7 +43,7 @@ page-home {
     width: 80%;
     border-radius: 10px;
     text-align: center;
-    z-index: 100;
+    //z-index: 100;
     opacity: 0.9;
 
     .active {
@@ -59,11 +59,11 @@ page-home {
   }
 
   #openButton {
-    z-index: 9995;
+    //z-index: 9995;
   }
 
   #alertButton {
-    z-index: 9990;
+    //z-index: 9990;
   }
 
   .invisible {

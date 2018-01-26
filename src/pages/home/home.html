@@ -13,30 +13,6 @@
 		</button>
   </ion-fab>
 
-  <ion-card #keyPad id="keyPad" class="keypad invisible" style="vertical-align: middle;">
-    <ion-card-header>
-      Enter code to disarm
-    </ion-card-header>
-
-    <ion-row>
-      <ion-col></ion-col>
-      <ion-col #keyPadStatus id="keyPadStatus">
-
-      </ion-col>
-      <ion-col></ion-col>
-    </ion-row>
-
-    <ion-row>
-      <ion-grid>
-        <ion-row *ngFor="let row of [0, 3, 6]">
-          <ion-col *ngFor="let col of [1 + row, 2 + row, 3 + row]">
-            <button ion-button full large color="light" (click)="sendKey(col)">{{col}}</button>
-          </ion-col>
-        </ion-row>
-      </ion-grid>
-    </ion-row>
-  </ion-card>
-
   <ion-footer>
     <button #alertButton id="alertButton" ion-button full large bottom class="invisible" (touchstart)="alert_start($event)" (touchend)="alert_end($event)">Idle</button>
   </ion-footer>

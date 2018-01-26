@@ -17,7 +17,25 @@
 
 
 <ion-content padding>
-  <ion-item class="full">
-      <button #alertButton id="alertButton" ion-button full large (touchstart)="start($event)" (touchend)="end($event)">Press me!</button>
-  </ion-item>
+  <ion-header>
+    Enter code to disarm
+  </ion-header>
+
+  <ion-row>
+    <ion-col></ion-col>
+    <ion-col #keyPadStatus id="keyPadStatus">
+
+    </ion-col>
+    <ion-col></ion-col>
+  </ion-row>
+
+  <ion-row>
+    <ion-grid>
+      <ion-row *ngFor="let row of [0, 3, 6]">
+        <ion-col *ngFor="let col of [1 + row, 2 + row, 3 + row]">
+          <button ion-button full large color="light" (click)="sendKey(col)">{{col}}</button>
+        </ion-col>
+      </ion-row>
+    </ion-grid>
+  </ion-row>
 </ion-content>

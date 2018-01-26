@@ -3,6 +3,7 @@ import { ActionSheetController, AlertController, App, LoadingController, NavCont
 import { Geolocation } from '@ionic-native/geolocation';
 import { Http } from '@angular/http';
 import * as utmObj from 'utm-latlng';
+import { AlertPage } from '../alert/alert';
 //var utmObj = require('utm-latlng');
 
 declare var google: any;
@@ -15,8 +16,6 @@ export class HomePage {
   @ViewChild('map') mapElement: ElementRef;
   @ViewChild('alertButton') alertButton : ElementRef;
   @ViewChild('openButton') openButton : ElementRef;
-  @ViewChild('keyPadStatus') keyPadStatus : ElementRef;
-  @ViewChild('keyPad') keyPad: ElementRef;
   addressElement: HTMLInputElement = null;
 
   map: any;
@@ -293,8 +292,6 @@ placeMarker(options){
     openButton.classList.toggle("invisible");
   }
 
-
-
   alert_start(event){
     //this.showToast("Start");
     event.target.classList.toggle("pressDown", true);
@@ -307,12 +304,7 @@ placeMarker(options){
     //this.showToast("End");
     event.target.classList.toggle("pressDown", false);
     event.target.innerText = "Idle";
-    this.keyPad.nativeElement.classList.toggle("invisible");
-  }
-
-  sendKey(n){
-    keyPadStatus.innerText += "●";
-    this.keypadInput += "" + n;
-    console.log(typeof(n), this.keypadInput);
+    //this.keyPad.nativeElement.classList.toggle("invisible");
+    this.nav.push(AlertPage);
   }
 }

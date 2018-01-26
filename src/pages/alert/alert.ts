@@ -14,28 +14,14 @@ import { IonicPage, NavController, NavParams, ToastController } from 'ionic-angu
   templateUrl: 'alert.html',
 })
 export class AlertPage {
+  @ViewChild('keyPadStatus') keyPadStatus: ElementRef;
+  @ViewChild('keyPad') keyPad: ElementRef;
 
-  constructor(public navCtrl: NavController, public navParams: NavParams, public toastCtrl: ToastController,) {
+  constructor(public navCtrl: NavController, public navParams: NavParams, public toastCtrl: ToastController, ) {
   }
 
   ionViewDidLoad() {
     console.log('ionViewDidLoad AlertPage');
-  }
-
-  start(event){
-    this.showToast("Start");
-    event.target.classList.toggle("pressDown", true);
-    event.target.innerText = "Armed";
-
-    console.log(event.target.className);
-  }
-
-  end(event){
-    this.showToast("End");
-    event.target.classList.toggle("pressDown", false);
-    event.target.innerText = "Idle";
-
-    console.log(event.target.className);
   }
 
   showToast(message) {
@@ -44,5 +30,11 @@ export class AlertPage {
       duration: 3000
     });
     toast.present();
+  }
+
+  sendKey(n){
+    keyPadStatus.innerText += "●";
+    this.keypadInput += "" + n;
+    console.log(typeof(n), this.keypadInput);
   }
 }
