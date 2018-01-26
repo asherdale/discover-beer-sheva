@@ -27,10 +27,11 @@ export class AlertPage {
 
     this.alertCountTimeout = setInterval(() => {
       if (--this.alertCountDown >= 1){
-
+        this.onTimeIn();
       }
       else{
         clearInterval(this.alertCountTimeout);
+        this.onTimeOut();
       }
     }, 1000);
   }
@@ -51,5 +52,13 @@ export class AlertPage {
     keyPadStatus.innerText += "●";
     this.keypadInput += "" + n;
     console.log(typeof(n), this.keypadInput);
+  }
+
+  onTimeIn(){
+
+  }
+
+  onTimeOut(){
+
   }
 }
