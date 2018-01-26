@@ -23,6 +23,7 @@ export class HomePage {
   error: any;
   currentregional: any;
   MYLOC: any;
+  keypadInput : any;
 
   constructor(
     public loadingCtrl: LoadingController,
@@ -37,6 +38,7 @@ export class HomePage {
     public geolocation: Geolocation,
     public http: Http,
   ) {
+    this.keypadInput = "";
     this.platform.ready().then(() => {
       this.loadMaps();
       this.loadMarkers();
@@ -310,6 +312,7 @@ placeMarker(options){
 
   sendKey(n){
     keyPadStatus.innerText += "●";
-    console.log(n);
+    this.keypadInput += "" + n;
+    console.log(typeof(n), this.keypadInput);
   }
 }
