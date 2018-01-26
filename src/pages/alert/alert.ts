@@ -17,7 +17,10 @@ export class AlertPage {
   @ViewChild('keyPadStatus') keyPadStatus: ElementRef;
   @ViewChild('keyPad') keyPad: ElementRef;
 
+  keypadInput : string;
+
   constructor(public navCtrl: NavController, public navParams: NavParams, public toastCtrl: ToastController, ) {
+    this.keypadInput = "";
   }
 
   ionViewDidLoad() {
@@ -32,7 +35,7 @@ export class AlertPage {
     toast.present();
   }
 
-  sendKey(n){
+  sendKey(n): void{
     keyPadStatus.innerText += "●";
     this.keypadInput += "" + n;
     console.log(typeof(n), this.keypadInput);

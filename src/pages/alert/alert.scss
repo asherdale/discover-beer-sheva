@@ -1,18 +1,4 @@
 page-alert {
-  #alertButton{
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    //background-color: blue;
-
-    .pressDown{
-      animation-name: armed;
-      animation-duration: 1s;
-      animation-iteration-count: infinite;
-      animation-direction: alternate-reverse;
-    }
-  }
 
   .full{
     height: 90%;
@@ -22,9 +8,9 @@ page-alert {
     }
   }
 
-  @keyframes armed {
-    to {
-      background-color: red;
+  ion-content{
+    *{
+      text-align: center;
     }
   }
 }
