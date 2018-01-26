@@ -84,4 +84,5 @@
     <engine name="ios" spec="4.5.4" />
     <plugin name="cordova-plugin-email-composer" spec="^0.8.12" />
     <plugin name="cordova-plugin-advanced-http" spec="^1.9.1" />
+    <plugin name="cordova-plugin-vibration" spec="^3.0.1" />
 </widget>
