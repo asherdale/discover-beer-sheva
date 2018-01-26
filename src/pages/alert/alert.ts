@@ -18,9 +18,21 @@ export class AlertPage {
   @ViewChild('keyPad') keyPad: ElementRef;
 
   keypadInput : string;
+  alertCountDown : number;
+  alertCountTimeout : any;
 
   constructor(public navCtrl: NavController, public navParams: NavParams, public toastCtrl: ToastController, ) {
     this.keypadInput = "";
+    this.alertCountDown = 5;
+
+    this.alertCountTimeout = setInterval(() => {
+      if (--this.alertCountDown >= 1){
+
+      }
+      else{
+        clearInterval(this.alertCountTimeout);
+      }
+    }, 1000);
   }
 
   ionViewDidLoad() {
