@@ -17,22 +17,22 @@
     <ion-card-header>
       Enter code to disarm
     </ion-card-header>
+    <!--
+    1 2 3
+    4 5 6
+    7 8 9
+    -->
 
+    <ion-grid>
+      <ion-row *ngFor="let row of [0, 3, 6]">
+        <ion-col *ngFor="let col of [1 + row, 2 + row, 3 + row]">
+            <button ion-button full large color="light" (click)="sendKey(col)">{{col}}</button>
+        </ion-col>
+      </ion-row>
+    </ion-grid>
   </ion-card>
 
-  <!--
-  1 2 3
-  4 5 6
-  7 8 9
-  -->
 
-  <ion-grid>
-    <ion-row *ngFor="let row of [0, 3, 6]">
-      <ion-col *ngFor="let col of [1 + row, 2 + row, 3 + row]">
-          <button ion-button (click)="sendKey(col)">{{col}}</button>
-      </ion-col>
-    </ion-row>
-  </ion-grid>
 
 
   <ion-footer>
