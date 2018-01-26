@@ -289,6 +289,8 @@ placeMarker(options){
     openButton.classList.toggle("invisible");
   }
 
+
+
   alert_start(event){
     //this.showToast("Start");
     event.target.classList.toggle("pressDown", true);
@@ -303,5 +305,9 @@ placeMarker(options){
     event.target.innerText = "Idle";
 
     console.log(event.target.className);
+  }
+
+  sendKey(n){
+    console.log(n);
   }
 }
