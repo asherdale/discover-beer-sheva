@@ -16,6 +16,7 @@ export class HomePage {
   @ViewChild('alertButton') alertButton : ElementRef;
   @ViewChild('openButton') openButton : ElementRef;
   @ViewChild('keyPadStatus') keyPadStatus : ElementRef;
+  @ViewChild('keyPad') keyPad: ElementRef;
   addressElement: HTMLInputElement = null;
 
   map: any;
@@ -306,8 +307,7 @@ placeMarker(options){
     //this.showToast("End");
     event.target.classList.toggle("pressDown", false);
     event.target.innerText = "Idle";
-
-    console.log(event.target.className);
+    this.keyPad.nativeElement.classList.toggle("invisible");
   }
 
   sendKey(n){

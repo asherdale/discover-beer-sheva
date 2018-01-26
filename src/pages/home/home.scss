@@ -59,11 +59,11 @@ page-home {
   }
 
   #openButton {
-    z-index: 1000;
+    z-index: 9995;
   }
 
   #alertButton {
-    z-index: 1001;
+    z-index: 9990;
   }
 
   .invisible {
@@ -89,7 +89,7 @@ page-home {
   }
 
   .keypad {
-    
+    z-index: 9999;
     #keyPadStatus{
       text-align: center;
     }

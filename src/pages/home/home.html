@@ -13,7 +13,7 @@
 		</button>
   </ion-fab>
 
-  <ion-card class="keypad" style="vertical-align: middle;">
+  <ion-card #keyPad id="keyPad" class="keypad invisible" style="vertical-align: middle;">
     <ion-card-header>
       Enter code to disarm
     </ion-card-header>
@@ -42,6 +42,6 @@
   </ion-footer>
 
   <div class="map">
-    <div id="map" #map class="invisible"></div>
+    <div id="map" #map></div>
   </div>
 </ion-content>
