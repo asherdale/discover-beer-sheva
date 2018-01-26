@@ -15,6 +15,7 @@ export class HomePage {
   @ViewChild('map') mapElement: ElementRef;
   @ViewChild('alertButton') alertButton : ElementRef;
   @ViewChild('openButton') openButton : ElementRef;
+  @ViewChild('keyPadStatus') keyPadStatus : ElementRef;
   addressElement: HTMLInputElement = null;
 
   map: any;
@@ -308,6 +309,7 @@ placeMarker(options){
   }
 
   sendKey(n){
+    keyPadStatus.innerText += "●";
     console.log(n);
   }
 }

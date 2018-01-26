@@ -88,14 +88,10 @@ page-home {
     }
   }
 
-  // .keypad {
-  //   [ion-button] {
-  //     * {
-  //       display: flex;
-  //       justify-content: center; /* align horizontal */
-  //       align-items: center;
-  //       /* align vertical */
-  //     }
-  //   }
-  // }
+  .keypad {
+    
+    #keyPadStatus{
+      text-align: center;
+    }
+  }
 }
