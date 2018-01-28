@@ -1,30 +1,32 @@
 page-about {
-
-  @import url('https://fonts.googleapis.com/css?family=Alegreya|Poppins|Tenor+Sans');
-
+  //  @import url('https://fonts.googleapis.com/css?family=Alegreya|Poppins|Tenor+Sans');
   .toolbar-background {
-    background-image: url('http://www.webdesignhot.com/wp-content/uploads/2012/05/Abstract-Swirl-Floral-Background-Vector-Graphic.jpg');
-    background-size: cover;
-  }
-
-  .title {
-    padding-right: 5%;
+    background-color: #6fa8dc;
   }
 
   .toolbar-title {
-    font-size: 26px;
-    font-family:  'Tenor Sans', sans-serif;
-    text-shadow: 2px 2px black;
-    color: white;
-    text-align: right;
-    padding: 0;
+    color: #FFFFFF;
   }
 
-  h2{
+  h3 {
     font-family: 'Poppins', sans-serif;
   }
 
-  h4{
-    font-family:'Alegreya', serif;
+  span {
+    font-family: 'Alegreya', serif;
+    font-size: 1.5em;
+    text-align: center;
+  }
+
+  .hr1 {
+    border-bottom: 1px solid #0b5394;
+    margin: 10px 0;
+    width: 85%;
+  }
+
+  .hr2 {
+    border-bottom: 1px solid #ccc;
+    margin: 10px 0;
+    width: 50%;
   }
 }
