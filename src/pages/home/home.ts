@@ -1,14 +1,44 @@
 // ionic cordova build ios --prod
-import { Component, NgZone, ViewChild, ElementRef } from '@angular/core';
-import { ActionSheetController, AlertController, App, LoadingController, NavController, Platform, ToastController, Events } from 'ionic-angular';
-import { Geolocation } from '@ionic-native/geolocation';
-import { GoogleAnalytics } from '@ionic-native/google-analytics';
-import { Http } from '@angular/http';
+import {
+  Component,
+  NgZone,
+  ViewChild,
+  ElementRef
+} from '@angular/core';
+import {
+  ActionSheetController,
+  AlertController,
+  App,
+  LoadingController,
+  NavController,
+  Platform,
+  ToastController,
+  Events,
+  MenuController
+} from 'ionic-angular';
+import {
+  Geolocation
+} from '@ionic-native/geolocation';
+import {
+  GoogleAnalytics
+} from '@ionic-native/google-analytics';
+import {
+  Http
+} from '@angular/http';
+import {
+  Storage
+} from '@ionic/storage';
 import 'rxjs/add/operator/map';
 
-import { PopoverController } from 'ionic-angular';
-import { PopoverPage } from './popover';
-import { PlacePage } from '../place/place';
+import {
+  PopoverController
+} from 'ionic-angular';
+import {
+  PopoverPage
+} from './popover';
+import {
+  PlacePage
+} from '../place/place';
 
 declare var google: any;
 
@@ -23,13 +53,17 @@ export class HomePage {
   map: any;
   loading: any;
   error: any;
-  currentregional: any;
 
   places: any = [];
   infoWindow: any = null;
   selectedPlace: any = null;
   userLocation: any = null;
-  selectedFilter: String = "all";
+  selectedFilter: string = 'All';
+  cats: any;
+  strings: any;
+  firstLocation: any = true;
+  favorites: any = [];
+  shouldRefilter: any = false;
 
   constructor(
     public loadingCtrl: LoadingController,
@@ -39,13 +73,14 @@ export class HomePage {
     public zone: NgZone,
     public platform: Platform,
     public alertCtrl: AlertController,
-    // public storage: Storage,
+    public storage: Storage,
     public actionSheetCtrl: ActionSheetController,
     public geolocation: Geolocation,
     public popoverCtrl: PopoverController,
     public events: Events,
     public ga: GoogleAnalytics,
-    public http: Http
+    public http: Http,
+    public menu: MenuController
   ) {
     this.ga.startTrackerWithId('UA-112680953-1')
       .then(() => {
@@ -54,7 +89,7 @@ export class HomePage {
       })
       .catch(e => console.log('Error starting GoogleAnalytics', e));
 
-    this.platform.ready().then(() => this.loadMaps());
+    this.platform.ready().then(() => this.loadMaps(null));
 
     events.subscribe('filter:changed', (newFilter) => {
       this.setDisplay(document.getElementById('arrow-button'), 'none', document.getElementById('menu-button'), 'block');
@@ -64,19 +99,49 @@ export class HomePage {
       this.selectedFilter = newFilter;
       this.filterResults();
     });
+
+    events.subscribe('favorite', placeID => this.addFavorite(placeID));
+    events.subscribe('unfavorite', placeID => this.removeFavorite(placeID));
+
+    this.storage.get('favorites').then((val) => {
+      if (val) {
+        this.favorites = val;
+      } else {
+        this.storage.set('favorites', []);
+      }
+      console.log(this.favorites);
+    });
+  }
+
+  ionViewDidEnter() {
+    // Disable swiping for side menu
+    this.menu.swipeEnable(false);
+    if (this.shouldRefilter) {
+      this.shouldRefilter = false;
+      this.filterResults();
+    }
+  }
+
+  ionViewWillLeave() {
+    // Re-enable swiping for side menu
+    this.menu.swipeEnable(true);
   }
 
 
-  loadMaps() {
+  loadMaps(nil) {
     var isOnline = window.navigator.onLine;
     if (isOnline && !!google) {
       this.http.get('assets/data/sampleBusinesses.json').map(res => res.json()).subscribe(data => {
         this.http.get('assets/data/categories.json').map(res2 => res2.json()).subscribe(cats => {
-          this.initializeMap(data.features, cats);
+          this.http.get('assets/data/strings.json').map(res3 => res3.json()).subscribe(strings => {
+            this.strings = strings;
+            this.cats = cats;
+            this.initializeMap(data.features, cats);
+          });
         });
       });
     } else {
-      this.errorAlert('Error', 'Something went wrong with the Internet Connection. Please check your Internet.')
+      this.errorAlert('Error', 'Something went wrong with the Internet Connection. Please check your Internet.', this.loadMaps, null)
     }
   }
 
@@ -85,49 +150,144 @@ export class HomePage {
       var mapEle = this.mapElement.nativeElement;
       this.map = new google.maps.Map(mapEle, {
         mapTypeId: google.maps.MapTypeId.ROADMAP,
-        styles: [
-          {
-            "featureType": "administrative",
-            "elementType": "geometry",
-            "stylers": [
+        styles:
+        [{
+            "featureType": "all",
+            "elementType": "all",
+            "stylers": [{
+                "saturation": "32"
+              },
               {
-                "visibility": "off"
+                "lightness": "-3"
+              },
+              {
+                "visibility": "on"
+              },
+              {
+                "weight": "1.18"
+              }
+            ]
+          },
+          {
+            "featureType": "landscape.man_made",
+            "elementType": "all",
+            "stylers": [{
+                "saturation": "-70"
+              },
+              {
+                "lightness": "14"
               }
             ]
           },
           {
             "featureType": "poi",
-            "stylers": [
-              {
-                "visibility": "off"
-              }
-            ]
+            "elementType": "labels",
+            "stylers": [{
+              "visibility": "off"
+            }]
           },
           {
             "featureType": "road",
             "elementType": "labels.icon",
-            "stylers": [
+            "stylers": [{
+              "visibility": "off"
+            }]
+          },
+          {
+            "featureType": "road.local",
+            "elementType": "geometry",
+            "stylers": [{
+              "weight": "2"
+            }]
+          },
+          {
+            "featureType": "transit",
+            "elementType": "labels",
+            "stylers": [{
+              "visibility": "off"
+            }]
+          },
+          {
+            "featureType": "water",
+            "elementType": "all",
+            "stylers": [{
+                "saturation": "100"
+              },
               {
-                "visibility": "off"
+                "lightness": "-14"
               }
             ]
           },
           {
-            "featureType": "transit",
-            "stylers": [
-              {
+            "featureType": "water",
+            "elementType": "labels",
+            "stylers": [{
                 "visibility": "off"
+              },
+              {
+                "lightness": "12"
               }
             ]
-          }
+          },
+          {
+            "featureType": "administrative",
+            "elementType": "geometry",
+            "stylers": [{
+              "visibility": "off"
+            }]
+          },
+          {
+            "featureType": "administrative",
+            "elementType": "geometry",
+            "stylers": [{
+              "visibility": "off"
+            }]
+          },
         ],
+        // [
+        // {
+        //   "featureType": "administrative",
+        //   "elementType": "geometry",
+        //   "stylers": [
+        //     {
+        //       "visibility": "off"
+        //     }
+        //   ]
+        // },
+        //   {
+        //     "featureType": "poi",
+        //     "stylers": [
+        //       {
+        //         "visibility": "off"
+        //       }
+        //     ]
+        //   },
+        //   {
+        //     "featureType": "road",
+        //     "elementType": "labels.icon",
+        //     "stylers": [
+        //       {
+        //         "visibility": "off"
+        //       }
+        //     ]
+        //   },
+        //   {
+        //     "featureType": "transit",
+        //     "stylers": [
+        //       {
+        //         "visibility": "off"
+        //       }
+        //     ]
+        //   }
+        // ],
+        gestureHandling: 'greedy',
         disableDoubleClickZoom: false,
         disableDefaultUI: true,
         zoomControl: false,
         mapTypeControl: true,
         mapTypeControlOptions: {
           position: google.maps.ControlPosition.LEFT_BOTTOM,
-           mapTypeIds: ['roadmap', 'satellite']
+          mapTypeIds: ['roadmap', 'satellite']
         }
       });
 
@@ -141,13 +301,14 @@ export class HomePage {
           this.openInfoWindow(place);
         });
       });
+      console.log(this.places);
       const markers = this.places.map(place => place.marker);
-      this.getUserLocation();
+      this.getUserLocation(this);
 
       google.maps.event.addListenerOnce(this.map, 'idle', () => {
         google.maps.event.trigger(this.map, 'resize');
         mapEle.classList.add('show-map');
-        this.bounceMap(markers);
+        this.bounceMap(markers, 0);
       });
 
       google.maps.event.addListener(this.map, 'bounds_changed', () => {
@@ -162,18 +323,16 @@ export class HomePage {
     });
   }
 
-  errorAlert(title, message) {
+  errorAlert(title, message, func, param) {
     let alert = this.alertCtrl.create({
       title: title,
       message: message,
-      buttons: [
-        {
-          text: 'OK',
-          handler: data => {
-            this.loadMaps();
-          }
+      buttons: [{
+        text: 'OK',
+        handler: data => {
+          func(param);
         }
-      ]
+      }]
     });
     alert.present();
   }
@@ -183,7 +342,7 @@ export class HomePage {
     const arrowButton = document.getElementById('arrow-button');
     const optionsButton = document.getElementById('options-button');
     const clearButton = document.getElementById('clear-button');
-    const searchInput = (<HTMLInputElement>document.getElementById('search-input'));
+    const searchInput = ( < HTMLInputElement > document.getElementById('search-input'));
     document.getElementById('search-form').onsubmit = () => {
       this.mapSearch(searchInput.value);
     }
@@ -227,7 +386,7 @@ export class HomePage {
 
   //Center zoom
   //http://stackoverflow.com/questions/19304574/center-set-zoom-of-map-to-cover-all-visible-markers
-  bounceMap(markers) {
+  bounceMap(markers, zoomOffset) {
     let bounds = new google.maps.LatLngBounds();
 
     for (var i = 0; i < markers.length; i++) {
@@ -235,6 +394,9 @@ export class HomePage {
     }
 
     this.map.fitBounds(bounds);
+
+    const currentZoom = this.map.getZoom();
+    this.map.setZoom(currentZoom - zoomOffset);
   }
 
   resizeMap() {
@@ -251,17 +413,25 @@ export class HomePage {
       },
       map: map,
       title: place.properties.name,
-      animation: google.maps.Animation.DROP,
+      // animation: google.maps.Animation.DROP,
     });
   }
 
 
   getInfoWindow(place) {
-    let contentString = '<div id="info-window-content">'+
-        `<h6 id="title">${place.properties.name}</h6>`+
-        `<p id="title">${place.cat}</p>`+
-        '<button id="toPlacePage">More</button>' +
-        '</div>';
+
+    const date = new Date();
+    const today = date.getDay() + 1;
+    let openInfo = place.properties[`days${today}`] ?
+      `${place.properties[`open${today}`]} - ${place.properties[`close${today}`]}` :
+      this.strings.closed;
+    let contentString = '<div id="info-window-content" dir="rtl">' +
+      `<h6 id="title" style="margin-top: 1rem;">${place.properties.name}</h6>` +
+      `<p id="cat">${place.cat}</p>` +
+      `<p style="display: inline-block; margin: auto; padding-left: 0.5rem;">שעות היום:</p>` +
+      `<p dir="ltr" style="display: inline-block; margin: auto;">${openInfo}</p><br>` +
+      '<button ion-button id="toPlacePage" style="font-size: 1.3rem; display: block; margin: 1rem auto 0;">More</button>' +
+      '</div>';
     return new google.maps.InfoWindow({
       content: contentString
     });
@@ -284,11 +454,14 @@ export class HomePage {
   }
 
   toPlacePage() {
-    this.nav.push(PlacePage, { place: this.selectedPlace, userLocation: this.userLocation });
+    this.nav.push(PlacePage, {
+      place: this.selectedPlace,
+      userLocation: this.userLocation,
+      favorites: this.favorites
+    });
   }
 
   mapSearch(query) {
-    console.log('query');
     this.closeInfoWindow();
     this.clearMarkers();
     this.selectedFilter = "all";
@@ -302,22 +475,20 @@ export class HomePage {
       }
     });
 
-
-    if (results.length == 1) {
+    if (results.length === 1) {
       this.openInfoWindow(results[0]);
-      this.map.setCenter({lat: results[0].latitude, lng: results[0].longitude});
-      this.map.setZoom(16);
+      this.bounceMap(this.getAttributeFromPlaces(results, 'marker'), 6);
     } else if (results.length > 0) {
-      this.bounceMap(this.getAttributeFromPlaces(results, 'marker'));
+      this.bounceMap(this.getAttributeFromPlaces(results, 'marker'), 1);
     } else {
       this.showToast("No results found.");
       this.showMarkers();
-      this.bounceMap(this.getAttributeFromPlaces(this.places, 'marker'));
+      this.bounceMap(this.getAttributeFromPlaces(this.places, 'marker'), 0);
     }
   }
 
   placeMatchesQuery(place, query) {
-    return place.title.toLowerCase().includes(query.toLowerCase());
+    return place.properties.name.toLowerCase().includes(query.toLowerCase());
   }
 
   // Sets the map on all markers in the array.
@@ -350,7 +521,10 @@ export class HomePage {
   }
 
   presentPopover(myEvent) {
-    let popover = this.popoverCtrl.create(PopoverPage, { selectedFilter: this.selectedFilter });
+    let popover = this.popoverCtrl.create(PopoverPage, {
+      'selectedFilter': this.selectedFilter,
+      'cats': this.cats
+    });
     popover.present({
       ev: myEvent
     });
@@ -361,50 +535,66 @@ export class HomePage {
     this.clearMarkers();
 
     const results = [];
-    this.places.forEach((place) => {
-      if (place.type == this.selectedFilter) {
+    let applicableCats = [];
+
+    this.cats['super-cats'].forEach((superCat) => {
+      if (superCat.name !== this.selectedFilter) {
+        return;
+      }
+      const subCats = superCat['sub-cats'];
+      subCats.forEach((subCat) => {
+        applicableCats = applicableCats.concat(this.cats['sub-cats'][subCat].cats);
+      });
+    });
+
+    const filterIsFavorites = this.selectedFilter === 'Favorites';
+    this.places.forEach((place) => {;
+      if ((filterIsFavorites && this.favorites.find(el => el === place.id)) ||
+        (applicableCats.find(el => el === parseInt(place.properties.type)))) {
         place.marker.setMap(this.map);
         results.push(place);
       }
     });
 
-    const displayName = this.selectedFilter.charAt(0).toUpperCase() + this.selectedFilter.slice(1);
-    (<HTMLInputElement>document.getElementById('search-input')).value = this.selectedFilter === "all" ? '' : displayName;
+    const filterIsAll = this.selectedFilter === 'All';
+    ( < HTMLInputElement > document.getElementById('search-input')).value = filterIsAll ? '' : this.selectedFilter;
 
-    if (results.length == 1) {
-      this.map.setCenter({lat: results[0].latitude, lng: results[0].longitude});
-      this.map.setZoom(16);
+    if (results.length === 1) {
+      this.bounceMap(this.getAttributeFromPlaces(results, 'marker'), 6);
     } else if (results.length > 0) {
-      this.bounceMap(this.getAttributeFromPlaces(results, 'marker'));
+      this.bounceMap(this.getAttributeFromPlaces(results, 'marker'), filterIsAll ? 0 : 1);
     } else {
       this.showMarkers();
-      this.bounceMap(this.getAttributeFromPlaces(this.places, 'marker'));
+      this.bounceMap(this.getAttributeFromPlaces(this.places, 'marker'), 0);
+      this.showToast("No results found.");
     }
   }
 
   locate() {
     if (this.userLocation && this.userLocation.position) {
       this.map.setCenter(this.userLocation.position);
-      this.map.setZoom(16);
+      this.map.setZoom(17);
     } else {
-      this.getUserLocation();
+      this.getUserLocation(this);
     }
-    // TODO: delete following
-    this.bounceMap(this.places.map(place => place.marker));
+
+    if (this.firstLocation) {
+      this.bounceMap(this.places.map(place => place.marker), 0);
+      this.firstLocation = false;
+    }
   }
 
   // go show currrent location
-  getUserLocation() {
-    this.loading = this.loadingCtrl.create({
+  getUserLocation(thisPage) {
+    thisPage.loading = thisPage.loadingCtrl.create({
       content: 'Searching Location ...'
     });
-    this.loading.present();
+    thisPage.loading.present();
 
-    const thisPage = this;
     if (navigator.geolocation) {
       navigator.geolocation.getCurrentPosition(
         (position) => {
-          this.loading.dismiss().then(() => {
+          thisPage.loading.dismiss().then(() => {
             thisPage.showToast('Location found!');
             thisPage.userLocation = new google.maps.Marker({
               position: {
@@ -412,21 +602,41 @@ export class HomePage {
                 lng: position.coords.longitude
               },
               map: thisPage.map,
-              animation: google.maps.Animation.DROP,
               icon: '../../assets/img/blue-dot.png',
             });
             thisPage.locate();
           });
         },
         (error) => {
-          this.loading.dismiss().then(() => {
-            thisPage.showToast('Location not found. Please enable your GPS!');
+          thisPage.loading.dismiss().then(() => {
+            // thisPage.showToast('Location not found. Please enable your GPS!');
+            thisPage.errorAlert('Error', 'Please allow your location to be accessed.', thisPage.getUserLocation, thisPage);
             console.log(error);
           });
         });
     } else {
-      this.showToast('Location not found. Please enable your GPS!');
+      thisPage.showToast('Location not found. Please enable your GPS!');
       console.log('Device/browser doesn\'t support Geolocation');
+    }
+  }
+
+  locatePressed() {
+    this.getUserLocation(this);
+  }
+
+  addFavorite(placeID) {
+    this.favorites.push(placeID);
+    this.storage.set('favorites', this.favorites);
+  }
+
+  removeFavorite(placeID) {
+    const index = this.favorites.indexOf(placeID);
+    if (index > -1) {
+      this.favorites.splice(index, 1);
+      this.storage.set('favorites', this.favorites);
+    }
+    if (this.selectedFilter === "Favorites") {
+      this.shouldRefilter = true;
     }
   }
 }

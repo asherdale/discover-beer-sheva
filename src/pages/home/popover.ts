@@ -10,7 +10,7 @@ import { GoogleAnalytics } from '@ionic-native/google-analytics';
         </ion-list-header>
 
         <ion-item *ngFor="let filter of filters">
-          <ion-label>{{filterDisplayName(filter.name)}}</ion-label>
+          <ion-label>{{filter.name}}</ion-label>
           <ion-radio checked={{filter.checked}} value={{filter.name}}></ion-radio>
         </ion-item>
       </ion-list>
@@ -18,30 +18,14 @@ import { GoogleAnalytics } from '@ionic-native/google-analytics';
 })
 
 export class PopoverPage {
-  filters: any = [{
-      "name": "all",
-      "checked": "true",
-    }, {
-      "name": "restaurants",
-      "checked": "false",
-    }, {
-      "name": "bakeries",
-      "checked": "false",
-    }, {
-      "name": "stores",
-      "checked": "false",
-    }, {
-      "name": "fitness",
-      "checked": "false",
-    }, {
-      "name": "museums",
-      "checked": "false",
-    }, ];
+  filters: any;
 
   constructor(public viewCtrl: ViewController, public events: Events, public navParams: NavParams, public ga: GoogleAnalytics) {
     this.ga.startTrackerWithId('UA-112680953-1')
       .then(() => this.ga.trackView('filter-popup'))
       .catch(e => console.log('Error starting GoogleAnalytics', e));
+
+    this.filters = this.navParams.get('cats')['super-cats'];
   }
 
   close() {
@@ -50,10 +34,6 @@ export class PopoverPage {
 
   ionViewDidLoad() {
     this.setChecked(this.navParams.get('selectedFilter'));
-  }
-
-  filterDisplayName(filterName) {
-    return filterName.charAt(0).toUpperCase() + filterName.slice(1);
   }
 
   filterClicked(event) {

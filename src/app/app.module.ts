@@ -9,6 +9,7 @@ import { PlacePage } from '../pages/place/place';
 import { AboutPage } from '../pages/about/about';
 import { ContactUsPage} from '../pages/contact-us/contact-us';
 import { PopoverPage } from '../pages/home/popover';
+import { HoursPopoverPage } from '../pages/place/hoursPopover';
 import { IonicStorageModule } from '@ionic/storage';
 
 import { Geolocation } from '@ionic-native/geolocation';
@@ -23,8 +24,8 @@ import { GoogleAnalytics } from '@ionic-native/google-analytics';
     PlacePage,
     AboutPage,
     ContactUsPage,
-    PopoverPage
-
+    PopoverPage,
+    HoursPopoverPage
   ],
   imports: [
     BrowserModule,
@@ -39,7 +40,8 @@ import { GoogleAnalytics } from '@ionic-native/google-analytics';
     PlacePage,
     AboutPage,
     ContactUsPage,
-    PopoverPage
+    PopoverPage,
+    HoursPopoverPage
   ],
   providers: [
     StatusBar,

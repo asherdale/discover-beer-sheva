@@ -8,6 +8,8 @@
 
   <ion-navbar id="navbar">
     <ion-title></ion-title>
+    <button id="heart-fill" (click)="unfavorite()"><ion-icon name="md-heart"></ion-icon></button>
+    <button id="heart-empty" (click)="favorite()"><ion-icon name="md-heart-outline"></ion-icon></button>
   </ion-navbar>
 
 </ion-header>
@@ -15,11 +17,7 @@
 
 <ion-content>
 
-  <img height="200" src="http://australiabusinessnews.com.au/wp-content/uploads/2016/05/iStock_000064948151_Medium-1170x777.jpg"/>
-
-  <!-- <ion-fab top left>
-    <button ion-fab id="close-button" (click)="closePlace()" color="light"><ion-icon name="close-circle"></ion-icon></button>
-  </ion-fab> -->
+  <img height="200" src="{{place.image}}"/>
 
   <div padding id="content" dir="rtl">
     <div id="header">
@@ -32,8 +30,8 @@
 
     <div id="timing">
       <h5 id="isOpen"></h5>
-      <h5 id="hours" dir="ltr">10:00 - 21:30</h5>
-      <ion-icon name="arrow-down"></ion-icon>
+      <h5 id="hours" dir="ltr"></h5>
+      <ion-icon name="arrow-down" (click)="presentPopover($event)"></ion-icon>
     </div>
 
     <div class="thin-sep-line"></div>
@@ -45,7 +43,7 @@
 
       <div id="left-side" style="float: left;">
         <h5 id="distance"></h5>
-        <ion-icon name="walk"></ion-icon>
+        <ion-icon id="walk-icon" name="walk"></ion-icon>
       </div>
     </div>
 
