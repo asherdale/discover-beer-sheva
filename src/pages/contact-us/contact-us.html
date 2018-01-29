@@ -1,68 +1,68 @@
 <ion-header>
   <ion-navbar>
-    <button id="menu-button" ion-button menuToggle color="dark">
+    <button id="menu-button" ion-button menuToggle color="light">
       <ion-icon name="md-menu"></ion-icon>
     </button>
-    <ion-title>
-      Contact
+    <ion-title id="title">
+      Contact Us
     </ion-title>
   </ion-navbar>
 </ion-header>
 
 <ion-content no-bounce>
-<ion-list>
-  <ion-grid inset>
-  <ion-row>
-    <ion-col col-6>
-      <ion-item>
-    <ion-label floating>First Name</ion-label>
-    <ion-input type="text"></ion-input>
-  </ion-item>
-</ion-col>
-    <ion-col col-6>
-      <ion-item>
-    <ion-label floating>Last Name</ion-label>
-    <ion-input type="text"></ion-input>
-  </ion-item>
-</ion-col>
-  </ion-row>
-  <ion-row>
-    <ion-col col-12>
-      <ion-item>
-    <ion-label floating>Email Adress</ion-label>
-    <ion-input type="text"></ion-input>
-  </ion-item>
-</ion-col>
-</ion-row>
+  <ion-list>
+    <ion-grid inset>
+      <ion-row>
+        <ion-col col-6>
+          <ion-item>
+            <ion-label floating>First Name</ion-label>
+            <ion-input type="text" id = "firstNameIn"></ion-input>
+          </ion-item>
+        </ion-col>
+        <ion-col col-6>
+          <ion-item>
+            <ion-label  floating>Last Name</ion-label>
+            <ion-input type="text" id = "lastNameIn"></ion-input>
+          </ion-item>
+        </ion-col>
+      </ion-row>
+      <ion-row>
+        <ion-col col-12>
+          <ion-item>
+            <ion-label  floating>Email Adress</ion-label>
+            <ion-input type="text" id= "emailIn"></ion-input>
+          </ion-item>
+        </ion-col>
+      </ion-row>
 
-<ion-row>
-  <ion-col col-12>
-    <ion-item>
-  <ion-label floating>Subject</ion-label>
-   <ion-input type="text"></ion-input>
-</ion-item>
-</ion-col>
-</ion-row>
+      <ion-row>
+        <ion-col col-12>
+          <ion-item>
+            <ion-label  floating>Subject</ion-label>
+            <ion-input type="text" id = "subjectIn"></ion-input>
+          </ion-item>
+        </ion-col>
+      </ion-row>
 
-<ion-row>
-  <ion-col col-12>
-    <ion-item>
-  <ion-label floating>Message</ion-label>
-   <ion-textarea ></ion-textarea>
-</ion-item>
-</ion-col>
-</ion-row>
+      <ion-row>
+        <ion-col col-12>
+          <ion-item>
+            <ion-label  stacked>Message</ion-label>
+            <ion-textarea id = "MessageTA" rows="10" maxLength="500" [(ngModel)]="inputContent"></ion-textarea>
+          </ion-item>
+        </ion-col>
+      </ion-row>
 
-<ion-row>
-  <ion-col col-sm-9>
- <ion-item>
-<button ion-button >Submit</button>
-</ion-item>
-</ion-col>
-</ion-row>
+      <ion-row>
+        <ion-col col-sm-9>
 
-</ion-grid>
-</ion-list>
+            <button ion-button full id="submitButton" (click)="submitEmail()">Submit</button>
+
+        </ion-col>
+      </ion-row>
+
+    </ion-grid>
+  </ion-list>
 
 
 
