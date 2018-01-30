@@ -64,6 +64,7 @@ export class HomePage {
   firstLocation: any = true;
   favorites: any = [];
   shouldRefilter: any = false;
+  favoriteChanged: any = null;
 
   constructor(
     public loadingCtrl: LoadingController,
@@ -102,20 +103,24 @@ export class HomePage {
 
     events.subscribe('favorite', placeID => this.addFavorite(placeID));
     events.subscribe('unfavorite', placeID => this.removeFavorite(placeID));
-
-    this.storage.get('favorites').then((val) => {
-      if (val) {
-        this.favorites = val;
-      } else {
-        this.storage.set('favorites', []);
-      }
-      console.log(this.favorites);
-    });
   }
 
   ionViewDidEnter() {
     // Disable swiping for side menu
     this.menu.swipeEnable(false);
+    if (this.favoriteChanged) {
+      this.places.forEach((place) => {
+        if (place.id === this.favoriteChanged) {
+          place.marker.setMap(null);
+          place.marker = this.getMarker(place, this.map);
+          place.marker.addListener('click', () => {
+            this.openInfoWindow(place);
+          });
+          this.openInfoWindow(place);
+        }
+      });
+      this.favoriteChanged = null;
+    }
     if (this.shouldRefilter) {
       this.shouldRefilter = false;
       this.filterResults();
@@ -131,12 +136,19 @@ export class HomePage {
   loadMaps(nil) {
     var isOnline = window.navigator.onLine;
     if (isOnline && !!google) {
-      this.http.get('assets/data/sampleBusinesses.json').map(res => res.json()).subscribe(data => {
-        this.http.get('assets/data/categories.json').map(res2 => res2.json()).subscribe(cats => {
-          this.http.get('assets/data/strings.json').map(res3 => res3.json()).subscribe(strings => {
-            this.strings = strings;
-            this.cats = cats;
-            this.initializeMap(data.features, cats);
+      this.storage.get('favorites').then((val) => {
+        if (val) {
+          this.favorites = val;
+        } else {
+          this.storage.set('favorites', []);
+        }
+        this.http.get('assets/data/sampleBusinesses.json').map(res => res.json()).subscribe(data => {
+          this.http.get('assets/data/categories.json').map(res2 => res2.json()).subscribe(cats => {
+            this.http.get('assets/data/strings.json').map(res3 => res3.json()).subscribe(strings => {
+              this.strings = strings;
+              this.cats = cats;
+              this.initializeMap(data.features, cats);
+            });
           });
         });
       });
@@ -301,7 +313,7 @@ export class HomePage {
           this.openInfoWindow(place);
         });
       });
-      console.log(this.places);
+
       const markers = this.places.map(place => place.marker);
       this.getUserLocation(this);
 
@@ -406,20 +418,21 @@ export class HomePage {
   }
 
   getMarker(place, map) {
-    return new google.maps.Marker({
+    const newMarker = new google.maps.Marker({
       position: {
         lat: place.geometry.coordinates[1],
         lng: place.geometry.coordinates[0]
       },
       map: map,
       title: place.properties.name,
+      icon: this.isFavorite(place.id) ? '../../assets/img/default.png' : '',
       // animation: google.maps.Animation.DROP,
     });
+    return newMarker;
   }
 
 
   getInfoWindow(place) {
-
     const date = new Date();
     const today = date.getDay() + 1;
     let openInfo = place.properties[`days${today}`] ?
@@ -454,6 +467,7 @@ export class HomePage {
   }
 
   toPlacePage() {
+    console.log(this.selectedPlace.marker);
     this.nav.push(PlacePage, {
       place: this.selectedPlace,
       userLocation: this.userLocation,
@@ -549,7 +563,7 @@ export class HomePage {
 
     const filterIsFavorites = this.selectedFilter === 'Favorites';
     this.places.forEach((place) => {;
-      if ((filterIsFavorites && this.favorites.find(el => el === place.id)) ||
+      if ((filterIsFavorites && this.isFavorite(place.id)) ||
         (applicableCats.find(el => el === parseInt(place.properties.type)))) {
         place.marker.setMap(this.map);
         results.push(place);
@@ -573,7 +587,7 @@ export class HomePage {
   locate() {
     if (this.userLocation && this.userLocation.position) {
       this.map.setCenter(this.userLocation.position);
-      this.map.setZoom(17);
+      this.map.setZoom(14);
     } else {
       this.getUserLocation(this);
     }
@@ -596,6 +610,9 @@ export class HomePage {
         (position) => {
           thisPage.loading.dismiss().then(() => {
             thisPage.showToast('Location found!');
+            if (thisPage.userLocation) {
+              thisPage.userLocation.setMap(null);
+            }
             thisPage.userLocation = new google.maps.Marker({
               position: {
                 lat: position.coords.latitude,
@@ -627,6 +644,7 @@ export class HomePage {
   addFavorite(placeID) {
     this.favorites.push(placeID);
     this.storage.set('favorites', this.favorites);
+    this.favoriteChanged = placeID;
   }
 
   removeFavorite(placeID) {
@@ -638,5 +656,10 @@ export class HomePage {
     if (this.selectedFilter === "Favorites") {
       this.shouldRefilter = true;
     }
+    this.favoriteChanged = placeID;
+  }
+
+  isFavorite(placeID) {
+    return this.favorites.find(el => el === placeID);
   }
 }

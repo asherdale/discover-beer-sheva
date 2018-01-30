@@ -43,9 +43,6 @@ export class PlacePage {
     this.userLocation = navParams.data.userLocation.position;
     this.place = navParams.data.place;
     this.isFavorite = navParams.data.favorites.find(el => el === this.place.id);
-    console.log(this.place.id);
-    console.log(navParams.data.favorites);
-    console.log(this.isFavorite);
 
     this.contactPoints.push([this.setNullIfEmpty(this.place.properties.phone) || 'No phone number provided', 'call']);
     this.contactPoints.push([this.setNullIfEmpty(this.place.properties.email) || 'No email address provided', 'mail']);
@@ -55,19 +52,19 @@ export class PlacePage {
 
   ionViewDidEnter() {
     if (this.isFavorite) {
-      (<HTMLElement>document.getElementById('heart-fill')).style.display = 'inline-block';
+      (<HTMLElement>document.getElementById('star-fill')).style.display = 'inline-block';
     } else {
-      (<HTMLElement>document.getElementById('heart-empty')).style.display = 'inline-block';
+      (<HTMLElement>document.getElementById('star-empty')).style.display = 'inline-block';
     }
   }
 
   ionViewDidLoad() {
     (<HTMLElement>document.getElementsByClassName('back-button')[0]).onclick = () => {
-      (<HTMLElement>document.getElementById('heart-fill')).style.display = 'none';
-      (<HTMLElement>document.getElementById('heart-empty')).style.display = 'none';
+      (<HTMLElement>document.getElementById('star-fill')).style.display = 'none';
+      (<HTMLElement>document.getElementById('star-empty')).style.display = 'none';
     };
 
-    const destCoords = this.place.geometry.coordinates.reverse().join(',');
+    const destCoords = this.place.geometry.coordinates.slice().reverse().join(',');
     const orgCoords = `${this.userLocation.lat()},${this.userLocation.lng()}`;
     const distanceRequest = `https://maps.googleapis.com/maps/api/distancematrix/json?mode=walking&language=iw&origins=${orgCoords}&destinations=${destCoords}&key=AIzaSyBzo-dNI0lo1OrPyyZxAhvwlXwj-98k95A`;
     this.http.get(distanceRequest).map(res => res.json()).subscribe(
@@ -165,18 +162,16 @@ export class PlacePage {
   }
 
   favorite() {
-    console.log('we got a heart!!');
     this.isFavorite = true;
-    (<HTMLElement>document.getElementById('heart-fill')).style.display = 'inline-block';
-    (<HTMLElement>document.getElementById('heart-empty')).style.display = 'none';
+    (<HTMLElement>document.getElementById('star-fill')).style.display = 'inline-block';
+    (<HTMLElement>document.getElementById('star-empty')).style.display = 'none';
     this.events.publish('favorite', this.place.id);
   }
 
   unfavorite() {
-    console.log('awww shit');
     this.isFavorite = false;
-    (<HTMLElement>document.getElementById('heart-empty')).style.display = 'inline-block';
-    (<HTMLElement>document.getElementById('heart-fill')).style.display = 'none';
+    (<HTMLElement>document.getElementById('star-empty')).style.display = 'inline-block';
+    (<HTMLElement>document.getElementById('star-fill')).style.display = 'none';
     this.events.publish('unfavorite', this.place.id);
   }
 }

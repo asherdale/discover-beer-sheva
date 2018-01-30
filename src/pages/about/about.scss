@@ -1,29 +1,18 @@
 page-about {
   //  @import url('https://fonts.googleapis.com/css?family=Alegreya|Poppins|Tenor+Sans');
-  .toolbar-background {
-    background-color: #6fa8dc;
-  }
-
-  .toolbar-title {
-    color: #FFFFFF;
-  }
-
   h3 {
     font-family: 'Poppins', sans-serif;
   }
-
   span {
     font-family: 'Alegreya', serif;
     font-size: 1.5em;
     text-align: center;
   }
-
   .hr1 {
-    border-bottom: 1px solid #0b5394;
+    border-bottom: 1px solid color($colors, primary, base);
     margin: 10px 0;
     width: 85%;
   }
-
   .hr2 {
     border-bottom: 1px solid #ccc;
     margin: 10px 0;

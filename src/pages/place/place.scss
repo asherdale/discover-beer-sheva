@@ -1,4 +1,7 @@
 page-place {
+  .toolbar-background {
+    background-color: $toolbar-background;
+  }
   ion-navbar {
     button {
       background: transparent;
@@ -6,11 +9,14 @@ page-place {
       margin-right: 2rem;
       display: none;
       ion-icon {
-        font-size: 2.3rem;
+        font-size: 2.9rem;
       }
     }
-    #heart-fill {
-      color: red;
+    #star-fill {
+      color: color($colors, primary, base);
+    }
+    #star-empty {
+      color: color($colors, primary, base);
     }
   }
   #content {

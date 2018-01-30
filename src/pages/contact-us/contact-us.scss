@@ -1,31 +1,18 @@
 page-contact {
-	.toolbar-background{
-		background-color: #6fa8dc;
-	}
-
-	.toolbar-title{
-		color: #FFFFFF;
-	}
-
-	#submitButton{
-		background-color: #6fa8dc;
-	}
-
-	.item-block{
-		font-size: 12px;
-		//text-align: center;
-	}
-	.item{
-		padding: 0px;
-	}
-
-	ion-textarea{
-		border: 1px solid #0b5394;
-		padding: 5px;
-
-	}
+  #submitButton {
+    background-color: color($colors, primary, base);
+  }
+  .item-block {
+    font-size: 12px; //text-align: center;
+  }
+  .item {
+    padding: 0px;
+  }
+  ion-textarea {
+    border: 1px solid color($colors, primary, base);
+    padding: 5px;
+  }
 }
-
 
 //light blue 6fa8dc
 //dark blue 0b5394
